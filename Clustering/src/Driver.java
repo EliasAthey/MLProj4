@@ -62,7 +62,7 @@ public class Driver {
         int[] clusters = Driver.clusteringAlgorithm.cluster(dataset, numClusters);
 
         // evaluate clusters and print result
-        double evaluation = Driver.evaluateClusters(dataset, clusters);
+        double evaluation = Driver.evaluateClusters(dataset, clusters, numClusters);
         System.out.println("Clustering Algorithm Performance: " + evaluation);
     }
 
@@ -85,10 +85,48 @@ public class Driver {
         System.out.print("\nHelp Text\n");
     }
 
-    private static double evaluateClusters(double[][] data, int[] clusters){
-        /**
-         * TODO
-         */
-        return 0;
+    /**
+     * Evaluates a given clustering using the objective function defined by ACO-based clustering
+     * @param data the data set that was clustered
+     * @param clusters the clustering given
+     * @param numClusters the number of clusters
+     * @return an objective value of clustering performance
+     */
+    private static double evaluateClusters(double[][] data, int[] clusters, int numClusters){
+
+        // compute cluster centers
+        double[][] centers = new double[numClusters][data[0].length];
+        for(int clusterIter = 0; clusterIter < clusters.length; clusterIter++){
+            int numInCluster = 0;
+            for(int dataIter = 0; dataIter < data.length; dataIter++){
+
+                // if the data point is in this cluster, sum to center
+                if(clusters[dataIter] == clusterIter){
+                    numInCluster++;
+                    for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
+                        centers[clusterIter][attrIter] += data[dataIter][attrIter];
+                    }
+                }
+            }
+            for(int clusterAttrIter = 0; clusterAttrIter < centers[clusterIter].length; clusterAttrIter++){
+                centers[clusterIter][clusterAttrIter] /= numInCluster;
+            }
+        }
+
+        //compute objective function
+        double objective = 0;
+        for(int dataIter = 0; dataIter < data.length; dataIter++){
+            for(int clusterIter = 0; clusterIter < centers.length; clusterIter++){
+                if(clusters[dataIter] == clusterIter){
+                    double innerSum = 0;
+                    for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
+                        innerSum += Math.pow(data[dataIter][attrIter] - centers[clusterIter][attrIter], 2);
+                    }
+                    objective += Math.sqrt(innerSum);
+                }
+            }
+        }
+
+        return objective;
     }
 }
