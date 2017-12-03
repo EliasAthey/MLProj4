@@ -18,6 +18,7 @@ public class Driver {
             System.exit(0);
         }
 
+        // set the clustering algorithm
         switch(args[0]){
             case "aco":
                 Driver.clusteringAlgorithm = new ACO();
@@ -36,6 +37,33 @@ public class Driver {
                 break;
         }
 
+        // set the data set to cluster
+        double[][] dataset = null;
+        switch(args[2]){
+            case "haberman":
+                dataset = Data.getHaberman();
+                break;
+            case "hrtu2":
+                dataset = Data.getHtru2();
+                break;
+            case "iris":
+                dataset = Data.getIris();
+                break;
+            case "road":
+                dataset = Data.getRoad();
+                break;
+            case "wine":
+                dataset = Data.getWine();
+                break;
+        }
+
+        // get the clusters
+        int numClusters = Integer.parseInt(args[1]);
+        int[] clusters = Driver.clusteringAlgorithm.cluster(dataset, numClusters);
+
+        // evaluate clusters and print result
+        double evaluation = Driver.evaluateClusters(dataset, clusters);
+        System.out.println("Clustering Algorithm Performance: " + evaluation);
     }
 
     /**
@@ -44,10 +72,23 @@ public class Driver {
      * @return true if arguments are valid
      */
     private static boolean verifyArgs(String[] args){
+        /**
+         * TODO
+         */
         return true;
     }
 
     private static void displayHelpText(){
+        /**
+         * TODO
+         */
         System.out.print("\nHelp Text\n");
+    }
+
+    private static double evaluateClusters(double[][] data, int[] clusters){
+        /**
+         * TODO
+         */
+        return 0;
     }
 }
