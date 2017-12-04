@@ -1,2 +1,4 @@
 Clustering/.idea/
+Clustering/out/
 *.iml
+*.class
