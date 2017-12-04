@@ -11,17 +11,21 @@ public class KMeans  extends Clustering{
      */
     @Override
     public int[] cluster(double[][] data, int numClusters){
+        int cycles =0 ;
         double[][] centroids = initCentroids(data, numClusters);
-        while(!hasConverged()){
+        while(!hasConverged(cycles)){
             ArrayList<Integer> labels = getLabels(centroids, data);
-            centroids = getCenttroids(labels, data, numClusters);
-
+            centroids = getCentroids(labels, data, numClusters);
+            cycles++;
         }
         return null;
     }
 
-    private boolean hasConverged() {
-        return false;
+    /**
+     * returns true if K-means has converged
+     */
+    private boolean hasConverged(int cycles) {
+        return (cycles >= 200);
     }
 
     /**
@@ -46,8 +50,6 @@ public class KMeans  extends Clustering{
         for (double[] point: data) {
             labels.add(labelPoint(point, centroids));
         }
-
-
         return labels;
     }
 
@@ -70,10 +72,31 @@ public class KMeans  extends Clustering{
         return findMinIndex(distances);
     }
 
+    /**
+     * create a new set of centroids by averaging position of all points associated with each centroid
+     */
+    private double[][] getCentroids(ArrayList<Integer> labels, double[][] data, int numClusters) {
 
-    private double[][] getCenttroids(ArrayList<Integer> labels, double[][] data, int numClusters) {
-
-        double[][] centroids = new double[numClusters][];
+        double[][] newCentroids = new double[numClusters][];
+        int[] divisors = new int[numClusters];
+        //loop thru each datapoint
+        for (int dataIter = 0; dataIter < data.length; dataIter++) {
+            //loop through each dimension of all datapoints
+            for (int dimIter = 0; dimIter < data[0].length; dimIter++) {
+                //get centroid assigned to this datapoint and add dimensions to dimensions of the centroid
+                newCentroids[labels.get(dataIter)][dimIter] += data[dataIter][dimIter];
+            }
+            divisors[labels.get(dataIter)]++; //iterate divisor for this centroid 
+        }
+        
+        //loop through all dimensions of all newCentroids
+        for (int centIter = 0; centIter < numClusters; centIter++) {
+            for (int dimIter = 0; dimIter < newCentroids[0].length; dimIter++) {
+                //divide every dimension sum by the divisor associated with the centroid
+                newCentroids[centIter][dimIter] = newCentroids[centIter][dimIter]/divisors[centIter];
+            }
+        }
+        return newCentroids;
     }
 
 
