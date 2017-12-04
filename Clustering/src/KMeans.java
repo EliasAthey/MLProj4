@@ -12,13 +12,15 @@ public class KMeans  extends Clustering{
     @Override
     public int[] cluster(double[][] data, int numClusters){
         int cycles =0 ;
+        ArrayList<Integer> labels = null;
         double[][] centroids = initCentroids(data, numClusters);
         while(!hasConverged(cycles)){
-            ArrayList<Integer> labels = getLabels(centroids, data);
+            labels = getLabels(centroids, data);
             centroids = getCentroids(labels, data, numClusters);
             cycles++;
         }
-        return null;
+        //convert from ArrayList<Integer> to int[]
+        return  labels.stream().mapToInt(i -> i).toArray();
     }
 
     /**
