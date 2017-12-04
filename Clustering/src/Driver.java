@@ -43,7 +43,7 @@ public class Driver {
             case "haberman":
                 dataset = Data.getHaberman();
                 break;
-            case "hrtu2":
+            case "htru2":
                 dataset = Data.getHtru2();
                 break;
             case "iris":
