@@ -14,20 +14,13 @@ public class KMeans  extends Clustering{
         int cycles =0 ;
         ArrayList<Integer> labels = null;
         double[][] centroids = initCentroids(data, numClusters);
-        while(!hasConverged(cycles)){
+        while(cycles < 200){
             labels = getLabels(centroids, data);
             centroids = getCentroids(labels, data, numClusters);
             cycles++;
         }
         //convert from ArrayList<Integer> to int[]
         return  labels.stream().mapToInt(i -> i).toArray();
-    }
-
-    /**
-     * returns true if K-means has converged
-     */
-    private boolean hasConverged(int cycles) {
-        return (cycles >= 200);
     }
 
     /**
@@ -50,7 +43,7 @@ public class KMeans  extends Clustering{
         ArrayList<Integer> labels = new ArrayList<>();
 
         for (double[] point: data) {
-            labels.add(labelPoint(point, centroids));
+            labels.add((Integer) labelPoint(point, centroids));
         }
         return labels;
     }
@@ -58,7 +51,7 @@ public class KMeans  extends Clustering{
     /**
      * finds centroid closest to given point and labels that point
      */
-    private Integer labelPoint(double[] point, double[][] centroids) {
+    private int labelPoint(double[] point, double[][] centroids) {
         double[] distances = new double[centroids.length];
 
         for (int centIter = 0; centIter < centroids.length; centIter++) {
@@ -104,11 +97,11 @@ public class KMeans  extends Clustering{
     /**
      * finds the minimum value in the input array and returns the index to be used as a label
      */
-    private Integer findMinIndex(double[] distances) {
+    private int findMinIndex(double[] distances) {
         double min = distances[0];
-        Integer minIndex = 0;
+        int minIndex = 0;
         //loops through all distances and finds the index of the minimum value
-        for (Integer distIter = 0; distIter < distances.length; distIter++) {
+        for (int distIter = 0; distIter < distances.length; distIter++) {
             if (min < distances[distIter]){
                 min = distances[distIter];
                 minIndex = distIter;
