@@ -99,31 +99,6 @@ public class KMeans  extends Clustering{
         return newCentroids;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * finds the minimum value in the input array and returns the index to be used as a label
      */
@@ -139,6 +114,4 @@ public class KMeans  extends Clustering{
         }
         return minIndex;
     }
-
-
 }
