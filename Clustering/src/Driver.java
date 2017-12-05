@@ -72,9 +72,27 @@ public class Driver {
      * @return true if arguments are valid
      */
     private static boolean verifyArgs(String[] args){
-        /**
-         * TODO
-         */
+        String boi = args[0];
+        if(!args[0].equals("aco") && !args[0].equals("dbs") && !args[0].equals("km") && !args[0].equals("nn") && !args[0].equals("pso")){
+            System.out.println("The first argument selects the algorithm");
+            System.out.println("Your input for the first argument was:\t" + args[0]);
+            System.out.println("Valid choices are: \n\taco\n\tdbs\n\tkm\n\tnn\n\tpso");
+            return false;
+        }
+        try{    Integer.parseInt(args[1]);}
+        catch (NumberFormatException e){
+            System.out.println("The second argument selects the number of clusters");
+            System.out.println("Your input for the second argument was:\t" + args[1]);
+            System.out.println("The second argument must be an integer");
+            return false;
+        }
+        if(!args[2].equals("haberman") && !args[2].equals("hrtu2") && !args[2].equals("iris") && !args[2].equals("road") && !args[2].equals("wine")){
+            System.out.println("The third argument selects the dataset");
+            System.out.println("Your input for the third argument was:\t" + args[2]);
+            System.out.println("Valid choices are: \n\thaberman\n\thrtu2\n\tiris\n\troad\n\twine");
+            return false;
+        }
+
         return true;
     }
 
