@@ -80,10 +80,10 @@ public class ACO extends Clustering{
                     int clusterForPoint;
                     double exploitVsExplore = Math.random();
                     if(exploitVsExplore <= this.probExploit){
-                        clusterForPoint = this.exploit(data[dataPointIndex], ants[antIter].getClusterCenters());
+                        clusterForPoint = this.exploit(data[dataPointIndex], ants[antIter].getClusterCenters(), pheromones[dataPointIndex]);
                     }
                     else{
-                        clusterForPoint = this.explore(data[dataPointIndex], ants[antIter].getClusterCenters());
+                        clusterForPoint = this.explore(data[dataPointIndex], ants[antIter].getClusterCenters(), pheromones[dataPointIndex]);
                     }
                 }
             }
@@ -99,8 +99,17 @@ public class ACO extends Clustering{
      * @param clusterCenters the cluster center matrix
      * @return the index of the cluster
      */
-    private int exploit(double[] datapoint, double[][] clusterCenters){
-
+    private int exploit(double[] datapoint, double[][] clusterCenters, double[] pheromones){
+        int maximizingCluster = 0;
+        double currentMaximum = -1;
+        for(int clusterIter = 0; clusterIter < clusterCenters.length; clusterIter++){
+            double valueToMaximize = pheromones[clusterIter] * Math.pow(this.distanceFromCluster(datapoint, clusterCenters[clusterIter]), this.relativeWeight);
+            if(valueToMaximize > currentMaximum){
+                currentMaximum = valueToMaximize;
+                maximizingCluster = clusterIter;
+            }
+        }
+        return maximizingCluster;
     }
 
     /**
@@ -109,12 +118,22 @@ public class ACO extends Clustering{
      * @param clusterCenters the cluster center matrix
      * @return the index of the cluster
      */
-    private int explore(double[] datapoint, double[][] clusterCenters){
+    private int explore(double[] datapoint, double[][] clusterCenters, double[] pheromones){
 
     }
 
-    private double distanceFromCluster(){
-
+    /**
+     * Computes the inverse distance between a data point and its associated cluster center
+     * @param datapoint the data point
+     * @param clusterCenter the cluster center
+     * @return the inverse distance
+     */
+    private double distanceFromCluster(double[] datapoint, double[] clusterCenter){
+        double sum = 0;
+        for(int attrIter = 0; attrIter < datapoint.length; attrIter++){
+            sum += Math.pow((datapoint[attrIter] - clusterCenter[attrIter]), 2);
+        }
+        return 1 / Math.sqrt(sum);
     }
 
     /**
