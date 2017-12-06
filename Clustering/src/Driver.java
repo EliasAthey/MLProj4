@@ -114,7 +114,7 @@ public class Driver {
 
         // compute cluster centers
         double[][] centers = new double[numClusters][data[0].length];
-        for(int clusterIter = 0; clusterIter < clusters.length; clusterIter++){
+        for(int clusterIter = 0; clusterIter < numClusters; clusterIter++){
             int numInCluster = 0;
             for(int dataIter = 0; dataIter < data.length; dataIter++){
 
