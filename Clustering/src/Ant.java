@@ -1,7 +1,9 @@
+import com.sun.corba.se.impl.io.TypeMismatchException;
+
 /**
  * Ant object used by ACO
  */
-public class Ant {
+public class Ant implements Comparable{
 
     /**
      * The weight matrix for this ant (dimensions: numDataPoints x numClusters)
@@ -47,10 +49,10 @@ public class Ant {
      * @param cluster the index of the cluster
      * @throws Exception if the data point or cluster index is invalid
      */
-    public void putPointInCluster(int point, int cluster) throws Exception{
+    public void putPointInCluster(int point, int cluster){
         // index validation
-        if(point < 0 || point >= this.weights.length) throw new Exception("point DNE in weights");
-        if(cluster < 0 || cluster >= this.weights[point].length) throw new Exception("cluster DNE in weights");
+        if(point < 0 || point >= this.weights.length) System.out.println("point DNE in weights");
+        if(cluster < 0 || cluster >= this.weights[point].length) System.out.println("cluster DNE in weights");
 
         // update weights
         for(int clusterIter = 0; clusterIter < this.weights[point].length; clusterIter++){
@@ -157,5 +159,34 @@ public class Ant {
      */
     public double getCurrentObjectiveValue(){
         return this.currentObjectiveValue;
+    }
+
+    /**
+     * Gets the weights
+     * @return the weights
+     */
+    public int[][] getWeights(){
+        return this.weights;
+    }
+
+    @Override
+    /**
+     * Sorts Ants according to their objective value, where a higher objective value is a
+     * Returns -1 if objective value of this Ant is less than the other's
+     * 0 if the values are the same
+     * 1 if objective value of this Ant is greater than the other's
+     */
+    public int compareTo(Object o) {
+        if(!o.getClass().getTypeName().equals("Ant")) throw new TypeMismatchException("Cannot compare this with an Ant");
+        Ant other = (Ant)o;
+        if(this.currentObjectiveValue - other.getCurrentObjectiveValue() > 0){
+            return 1;
+        }
+        else if(this.currentObjectiveValue - other.getCurrentObjectiveValue() < 0){
+            return -1;
+        }
+        else{
+            return 0;
+        }
     }
 }

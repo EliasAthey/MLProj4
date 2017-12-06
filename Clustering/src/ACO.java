@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 /**
@@ -53,26 +56,28 @@ public class ACO extends Clustering{
         }
 
         // the list of ants
-        Ant[] ants = new Ant[this.numAnts];
-        for(int antIter = 0; antIter < ants.length; antIter++){
-            ants[antIter] = new Ant(new int[data.length][numClusters], new double[numClusters][data[0].length], new int[data.length]);
+        ArrayList<Ant> ants = new ArrayList<>();
+        for(int antIter = 0; antIter < this.numAnts; antIter++){
+            ants.add(new Ant(new int[data.length][numClusters], new double[numClusters][data[0].length], new int[data.length]));
         }
 
         // the main algorithm loop
         int currentIter = 0;
+        int[][] bestAntWeights = null;
+        double bestObjectiveValue = Double.MAX_VALUE;
         do{
             // for each ant, cluster all data points
-            for(int antIter = 0; antIter < ants.length; antIter++){
+            for(int antIter = 0; antIter < ants.size(); antIter++){
                 // reset ant variables
-                ants[antIter].resetMemory();
-                ants[antIter].resetClusterCenters();
-                ants[antIter].resetWeights();
+                ants.get(antIter).resetMemory();
+                ants.get(antIter).resetClusterCenters();
+                ants.get(antIter).resetWeights();
 
                 // cluster each data point
-                while(!ants[antIter].isMemoryFull()){
+                while(!ants.get(antIter).isMemoryFull()){
                     // select random data point not in memory
                     int dataPointIndex = (int)(Math.random() * data.length);
-                    while(ants[antIter].getMemory()[dataPointIndex] == 1){
+                    while(ants.get(antIter).getMemory()[dataPointIndex] == 1){
                         dataPointIndex = (int)(Math.random() * data.length);
                     }
 
@@ -80,17 +85,56 @@ public class ACO extends Clustering{
                     int clusterForPoint;
                     double exploitVsExplore = Math.random();
                     if(exploitVsExplore <= this.probExploit){
-                        clusterForPoint = this.exploit(data[dataPointIndex], ants[antIter].getClusterCenters(), pheromones[dataPointIndex]);
+                        clusterForPoint = this.exploit(data[dataPointIndex], ants.get(antIter).getClusterCenters(), pheromones[dataPointIndex]);
                     }
                     else{
-                        clusterForPoint = this.explore(data[dataPointIndex], ants[antIter].getClusterCenters(), pheromones[dataPointIndex]);
+                        clusterForPoint = this.explore(data[dataPointIndex], ants.get(antIter).getClusterCenters(), pheromones[dataPointIndex]);
                     }
+
+                    // put point in determined cluster (update weights and memory) and update centers
+                    ants.get(antIter).putPointInCluster(dataPointIndex, clusterForPoint);
+                    ants.get(antIter).calculateClusterCenters(data);
+                }
+
+                // update objective value
+                ants.get(antIter).setCurrentObjectiveValue(this.evaluateObjectiveFunction(data, ants.get(antIter).getWeights(), ants.get(antIter).getClusterCenters()));
+            }
+
+            // sort list of ants by their objective value, first index is lowest value
+            Collections.sort(ants);
+
+            // compare current best with best so far, keep whichever minimizes objective value
+            if(currentIter == 0 || ants.get(0).getCurrentObjectiveValue() < bestObjectiveValue){
+                bestAntWeights = ants.get(0).getWeights();
+                bestObjectiveValue = ants.get(0).getCurrentObjectiveValue();
+            }
+
+            // update pheromones
+            for(int dataIter = 0; dataIter < pheromones.length; dataIter++){
+                for(int clusterIter = 0; clusterIter < pheromones[dataIter].length; clusterIter++){
+                    double temp = (1 - this.pheromoneDecay) * pheromones[dataIter][clusterIter];
+                    for(int eliteAntIter = 0; eliteAntIter < this.numElite; eliteAntIter++){
+                        temp += (1 / ants.get(eliteAntIter).getCurrentObjectiveValue());
+                    }
+                    pheromones[dataIter][clusterIter] = temp;
                 }
             }
 
             currentIter++;
         }
         while(currentIter < this.maxIterations);
+
+        // convert the best ant's weight matrix into an int[] and return
+        int[] finalClusters = new int[bestAntWeights.length];
+        for(int dataIter = 0; dataIter < bestAntWeights.length; dataIter++){
+            for(int clusterIter = 0; clusterIter < bestAntWeights[dataIter].length; clusterIter++){
+                if(bestAntWeights[dataIter][clusterIter] == 1){
+                    finalClusters[dataIter] = clusterIter;
+                    break;
+                }
+            }
+        }
+        return finalClusters;
     }
 
     /**
@@ -147,6 +191,27 @@ public class ACO extends Clustering{
             sum += Math.pow((datapoint[attrIter] - clusterCenter[attrIter]), 2);
         }
         return 1 / Math.sqrt(sum);
+    }
+
+    /**
+     * Computes the objective function of an ant
+     * @param data the data set
+     * @param weights the ants weight matrix
+     * @param clusterCenters the ants cluster center matrix
+     * @return the ants objective value
+     */
+    private double evaluateObjectiveFunction(double[][] data, int[][] weights, double[][] clusterCenters){
+        double objective = 0;
+        for(int dataIter = 0; dataIter < data.length; dataIter++){
+            for(int clusterIter = 0; clusterIter < clusterCenters.length; clusterIter++){
+                double innerSum = 0;
+                for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
+                    innerSum += Math.pow(data[dataIter][attrIter] - clusterCenters[clusterIter][attrIter], 2);
+                }
+                objective += (weights[dataIter][clusterIter] * Math.sqrt(innerSum));
+            }
+        }
+        return objective;
     }
 
     /**
