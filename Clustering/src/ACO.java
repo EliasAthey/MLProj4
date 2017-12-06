@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * Ant Colony Optimization base clustering
  */
@@ -32,8 +34,86 @@ public class ACO extends Clustering{
      */
     private double maxIterations = 1000;
 
+    /**
+     * The rate of decay for pheromones
+     */
+    private double pheromoneDecay = 0.5;
+
     @Override
+    /**
+     * The ACO-based clustering algorithm
+     */
     public int[] cluster(double[][] data, int numClusters){
+        // the pheromone matrix, initialized to small random values: [0, 0.1]
+        double[][] pheromones = new double[data.length][numClusters];
+        for(int dataIter = 0; dataIter < pheromones.length; dataIter++){
+            for(int clusterIter = 0; clusterIter < pheromones[dataIter].length; clusterIter++){
+                pheromones[dataIter][clusterIter] = Math.random() * 0.1;
+            }
+        }
+
+        // the list of ants
+        Ant[] ants = new Ant[this.numAnts];
+        for(int antIter = 0; antIter < ants.length; antIter++){
+            ants[antIter] = new Ant(new int[data.length][numClusters], new double[numClusters][data[0].length], new int[data.length]);
+        }
+
+        // the main algorithm loop
+        int currentIter = 0;
+        do{
+            // for each ant, cluster all data points
+            for(int antIter = 0; antIter < ants.length; antIter++){
+                // reset ant variables
+                ants[antIter].resetMemory();
+                ants[antIter].resetClusterCenters();
+                ants[antIter].resetWeights();
+
+                // cluster each data point
+                while(!ants[antIter].isMemoryFull()){
+                    // select random data point not in memory
+                    int dataPointIndex = (int)(Math.random() * data.length);
+                    while(ants[antIter].getMemory()[dataPointIndex] == 1){
+                        dataPointIndex = (int)(Math.random() * data.length);
+                    }
+
+                    // choose the cluster
+                    int clusterForPoint;
+                    double exploitVsExplore = Math.random();
+                    if(exploitVsExplore <= this.probExploit){
+                        clusterForPoint = this.exploit(data[dataPointIndex], ants[antIter].getClusterCenters());
+                    }
+                    else{
+                        clusterForPoint = this.explore(data[dataPointIndex], ants[antIter].getClusterCenters());
+                    }
+                }
+            }
+
+            currentIter++;
+        }
+        while(currentIter < this.maxIterations);
+    }
+
+    /**
+     * Determines the cluster by exploiting the pheromones
+     * @param datapoint the data point being clustered
+     * @param clusterCenters the cluster center matrix
+     * @return the index of the cluster
+     */
+    private int exploit(double[] datapoint, double[][] clusterCenters){
+
+    }
+
+    /**
+     * Determines the cluster by exploring the search space
+     * @param datapoint the data point being clustered
+     * @param clusterCenters the cluster center matrix
+     * @return the index of the cluster
+     */
+    private int explore(double[] datapoint, double[][] clusterCenters){
+
+    }
+
+    private double distanceFromCluster(){
 
     }
 
