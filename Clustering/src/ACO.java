@@ -66,6 +66,9 @@ public class ACO extends Clustering{
         int[][] bestAntWeights = null;
         double bestObjectiveValue = Double.MAX_VALUE;
         do{
+            // print best so far objective value
+            System.out.println("Best-so-far objective value: " + bestObjectiveValue);
+
             // for each ant, cluster all data points
             for(int antIter = 0; antIter < ants.size(); antIter++){
                 // reset ant variables

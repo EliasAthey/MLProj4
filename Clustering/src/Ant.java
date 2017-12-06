@@ -69,7 +69,7 @@ public class Ant implements Comparable{
      * @param data the data points that were clustered
      */
     public void calculateClusterCenters(double[][] data){
-        for(int clusterIter = 0; clusterIter < clusterCenters.length; clusterIter++){
+        for(int clusterIter = 0; clusterIter < this.clusterCenters.length; clusterIter++){
             int numInCluster = 0;
             for(int dataIter = 0; dataIter < data.length; dataIter++){
 
@@ -82,7 +82,9 @@ public class Ant implements Comparable{
                 }
             }
             for(int clusterAttrIter = 0; clusterAttrIter < this.clusterCenters[clusterIter].length; clusterAttrIter++){
-                this.clusterCenters[clusterIter][clusterAttrIter] /= numInCluster;
+                if(numInCluster > 0){
+                    this.clusterCenters[clusterIter][clusterAttrIter] /= numInCluster;
+                }
             }
         }
     }

@@ -127,7 +127,9 @@ public class Driver {
                 }
             }
             for(int clusterAttrIter = 0; clusterAttrIter < centers[clusterIter].length; clusterAttrIter++){
-                centers[clusterIter][clusterAttrIter] /= numInCluster;
+                if(numInCluster > 0){
+                    centers[clusterIter][clusterAttrIter] /= numInCluster;
+                }
             }
         }
 
