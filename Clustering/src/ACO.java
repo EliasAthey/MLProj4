@@ -119,7 +119,20 @@ public class ACO extends Clustering{
      * @return the index of the cluster
      */
     private int explore(double[] datapoint, double[][] clusterCenters, double[] pheromones){
-
+        int maximizingCluster = 0;
+        double currentMaximumProb = -1;
+        for(int clusterProbsIter = 0 ; clusterProbsIter < clusterCenters.length; clusterProbsIter++){
+            double denom = 0;
+            for(int clusterIter = 0; clusterIter < pheromones.length; clusterIter++){
+                denom += (pheromones[clusterIter] * Math.pow(this.distanceFromCluster(datapoint, clusterCenters[clusterProbsIter]), this.relativeWeight));
+            }
+            double clusterProb = (pheromones[clusterProbsIter] * Math.pow(this.distanceFromCluster(datapoint, clusterCenters[clusterProbsIter]), this.relativeWeight)) / denom;
+            if(clusterProb > currentMaximumProb){
+                currentMaximumProb = clusterProb;
+                maximizingCluster = clusterProbsIter;
+            }
+        }
+        return maximizingCluster;
     }
 
     /**
