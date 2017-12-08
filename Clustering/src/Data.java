@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -10,14 +9,14 @@ public class Data {
     /**
      * The five data sets
      */
-    private static double[][] haberman, iris, wine, road, htru2;
+    private static Double[][] haberman, iris, wine, road, htru2;
 
     /**
      * TODO
      * Gets the Habermans data set
      * @return the Habermans data set
      */
-    public static double[][] getHaberman(){
+    public static Double[][] getHaberman(){
         Scanner fileScanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("haberman.data"));
         return Data.getDataset(fileScanner, 306, 3);
     }
@@ -27,7 +26,7 @@ public class Data {
      * Gets the Iris data set
      * @return the Iris data set
      */
-    public static double[][] getIris(){
+    public static Double[][] getIris(){
         Scanner fileScanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("iris.data"));
         return Data.getDataset(fileScanner, 150, 4);
     }
@@ -37,7 +36,7 @@ public class Data {
      * Gets the  Wine data set
      * @return the Wine data set
      */
-    public static double[][] getWine(){
+    public static Double[][] getWine(){
         Scanner fileScanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("wine.data"));
         return Data.getDataset(fileScanner, 178, 13);
     }
@@ -47,7 +46,7 @@ public class Data {
      * Gets the 3d-Road Network data set
      * @return the 3d-Road Network data set
      */
-    public static double[][] getRoad(){
+    public static Double[][] getRoad(){
         Scanner fileScanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("3D_spatial_road_network_denmark.data"));
         return Data.getDataset(fileScanner, 434874, 4);
     }
@@ -57,7 +56,7 @@ public class Data {
      * Gets the htru2 data set
      * @return the htru2 data set
      */
-    public static double[][] getHtru2(){
+    public static Double[][] getHtru2(){
         Scanner fileScanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("HTRU_2.data"));
         return Data.getDataset(fileScanner, 17898, 8);
     }
@@ -67,8 +66,8 @@ public class Data {
      * @param fileScanner the scanner for the data set
      * @return the data set in terms of doubles
      */
-    private static double[][] getDataset(Scanner fileScanner, int numEntries, int numAttrs){
-        double[][] dataset = new double[numEntries][numAttrs];
+    private static Double[][] getDataset(Scanner fileScanner, int numEntries, int numAttrs){
+        Double[][] dataset = new Double[numEntries][numAttrs];
         int lineIter = 0;
         do{
             try{
