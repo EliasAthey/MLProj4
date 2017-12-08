@@ -4,22 +4,23 @@ import java.util.ArrayList;
 /**
  * Particle Swarm Optimization clustering
  */
-public class PSO extends Clustering{
+public class PSO extends Clustering {
     private Particle[] swarm;
     private final int swarmSize = 200;
     private Particle bestParticle;
     private final double interita = .5;
     private final double phiMax = .8;
-    private final double maxVelocity = 30.0;
+    private double[] maxVelocity;
     private int numClusters;
 
     @Override
-    public int[] cluster(double[][] data, int numClusters){
+    public int[] cluster(double[][] data, int numClusters) {
         this.numClusters = numClusters;
         int cycles = 0;
-        initSwarm(data);       //initializes swarm with particles with random points as
-        while (cycles < 100) {                      // positions and random points as velocities
-            calcFitness(data);              //calcs and assigns fitness to all particles in swarm
+        setMaxVelocity(data);       //sets the max velocity for each attribute
+        initSwarm(data);            //initializes swarm with particles with random points as
+        while (cycles < 100) {      // positions and random points as velocities
+            calcFitness(data);      //calcs and assigns fitness to all particles in swarm
             updateVelocity();
             updatePosition();
             cycles++;
@@ -29,7 +30,8 @@ public class PSO extends Clustering{
         System.out.println("Final fitness :\t" + this.bestParticle.getBestFitness());
         //return this.bestParticle.getBestPosition();
 
-        int[] labels = getLabels(this.bestParticle.getBestPosition(), data).stream().mapToInt(i -> i).toArray();;
+        int[] labels = getLabels(this.bestParticle.getBestPosition(), data).stream().mapToInt(i -> i).toArray();
+        ;
         return labels;
     }
 
@@ -51,14 +53,14 @@ public class PSO extends Clustering{
             //fill randVelocity with random points to be the velocity
             for (int clusterIter = 0; clusterIter < this.numClusters; clusterIter++) {
 
-                randPosition[clusterIter] = data[(int)(Math.random() * data.length)];
+                randPosition[clusterIter] = data[(int) (Math.random() * data.length)];
                 //divide by 4 to start velocities off small
-                randVelocity[clusterIter] = data[(int)(Math.random() * data.length / 4)];
+                randVelocity[clusterIter] = data[(int) (Math.random() * data.length / 4)];
             }
             //create new particle with random position then add to swarm
-            this.swarm [swarmIter] = new Particle(randPosition, randVelocity);
-            this.swarm [swarmIter].setBestPosition(this.swarm [swarmIter].getPosition());
-            this.swarm [swarmIter].setBestVelocity(this.swarm [swarmIter].getVelocity());
+            this.swarm[swarmIter] = new Particle(randPosition, randVelocity);
+            this.swarm[swarmIter].setBestPosition(this.swarm[swarmIter].getPosition());
+            this.swarm[swarmIter].setBestVelocity(this.swarm[swarmIter].getVelocity());
         }
         //set best particle to a random particle to avoid null pointers on first round of calcFitness
         this.bestParticle = this.swarm[(int) (Math.random() * this.swarmSize)];
@@ -68,27 +70,27 @@ public class PSO extends Clustering{
      * for all particles calculate the average distance all datapoints are away from their closest centroid
      */
     private void calcFitness(double[][] data) {
-        for (Particle particle: this.swarm) {
+        for (Particle particle : this.swarm) {
             int[] labels = makeLables(particle, data);
-            double distSum =0.0;
+            double distSum = 0.0;
             for (int dataIter = 0; dataIter < data.length; dataIter++) {
-                double pointSum =0.0;
+                double pointSum = 0.0;
                 for (int dimIter = 0; dimIter < data[dataIter].length; dimIter++) {
                     //calc squared difference between point and closest centroid in the particle
                     pointSum += Math.pow(data[dataIter][dimIter] - particle.getPosition()[labels[dataIter]][dimIter], 2);
                 }
                 distSum += Math.sqrt(pointSum);
             }
-            double fitness = distSum/this.numClusters;
+            double fitness = distSum / this.numClusters;
             particle.setFitness(fitness);
 
-            if (fitness < particle.getBestFitness()){
+            if (fitness < particle.getBestFitness()) {
                 particle.setBestFitness(fitness);
                 particle.setBestVelocity(particle.getVelocity());
                 particle.setBestPosition(particle.getPosition());
             }
 
-            if(particle.getFitness() < this.bestParticle.getFitness()){
+            if (particle.getFitness() < this.bestParticle.getFitness()) {
                 this.bestParticle = particle;
             }
         }
@@ -98,7 +100,7 @@ public class PSO extends Clustering{
      * updates velocity for all particles in swarm
      */
     private void updateVelocity() {
-        for (Particle particle: this.swarm) {
+        for (Particle particle : this.swarm) {
             double phi1 = Math.random() * this.phiMax;
             double phi2 = Math.random() * this.phiMax;
             double[][] globalBest = this.bestParticle.getBestPosition();
@@ -115,10 +117,10 @@ public class PSO extends Clustering{
             for (int centIter = 0; centIter < globalBest.length; centIter++) {
                 for (int dimIter = 0; dimIter < globalBest[0].length; dimIter++) {
                     //compute the new value
-                    double newVel = newVelocity[centIter][dimIter] + personalBest[centIter][dimIter] +  globalBest[centIter][dimIter];
+                    double newVel = newVelocity[centIter][dimIter] + personalBest[centIter][dimIter] + globalBest[centIter][dimIter];
                     //check if the new value is above max velocity to avoid runaway velocities
-                    if( newVel > this.maxVelocity) {
-                        newVel = this.maxVelocity;
+                    if (newVel > this.maxVelocity[dimIter]) {
+                        newVel = this.maxVelocity[dimIter];
                     }
                     newVelocity[centIter][dimIter] = newVel;
                 }
@@ -132,12 +134,12 @@ public class PSO extends Clustering{
      * updates position for all particles in swarm
      */
     private void updatePosition() {
-        for (Particle particle: this.swarm) {
+        for (Particle particle : this.swarm) {
 
             double[][] newPosition = particle.getPosition();
             for (int centIter = 0; centIter < particle.getPosition().length; centIter++) {
-                for (int dimIter = 0; dimIter <  particle.getPosition()[0].length; dimIter++) {
-                    newPosition[centIter][dimIter] = newPosition[centIter][dimIter] +  particle.getVelocity()[centIter][dimIter];
+                for (int dimIter = 0; dimIter < particle.getPosition()[0].length; dimIter++) {
+                    newPosition[centIter][dimIter] = newPosition[centIter][dimIter] + particle.getVelocity()[centIter][dimIter];
                 }
             }
             particle.setPosition(newPosition);
@@ -155,7 +157,7 @@ public class PSO extends Clustering{
 
             for (int dimIter = 0; dimIter < centroids[0].length; dimIter++) {
                 //square the difference in each dimension then add it to the sum
-                sum += Math.pow( point[dimIter] - centroids[centIter][dimIter], 2);
+                sum += Math.pow(point[dimIter] - centroids[centIter][dimIter], 2);
             }
             distances[centIter] = Math.sqrt(sum);
         }
@@ -169,7 +171,7 @@ public class PSO extends Clustering{
     private ArrayList<Integer> getLabels(double[][] centroids, double[][] data) {
         ArrayList<Integer> labels = new ArrayList<>();
 
-        for (double[] point: data) {
+        for (double[] point : data) {
             labels.add(labelPoint(point, centroids));
         }
         return labels;
@@ -189,7 +191,7 @@ public class PSO extends Clustering{
             //find distance from point to all centroids
             for (int centIter = 0; centIter < centroids.length; centIter++) {
 
-                double sum =0;
+                double sum = 0;
                 for (int dimIter = 0; dimIter < centroids[0].length; dimIter++) {
                     //square the difference in each dimension then add it to the sum
                     sum += Math.pow(data[pointIter][dimIter] - centroids[centIter][dimIter], 2);
@@ -210,7 +212,7 @@ public class PSO extends Clustering{
         int minIndex = 0;
         //loops through all distances and finds the index of the minimum value
         for (int distIter = 0; distIter < distances.length; distIter++) {
-            if (min > distances[distIter]){
+            if (min > distances[distIter]) {
                 min = distances[distIter];
                 minIndex = distIter;
             }
@@ -218,45 +220,24 @@ public class PSO extends Clustering{
         return minIndex;
     }
 
+    /**
+     * sets the max velocity for each attribute by finding the max value for that attribute
+     * and setting the max velocity to 1/10th of the max
+     */
+    private void setMaxVelocity(double[][] data) {
+        //holds maximim values for all attributes
+        double[] maxValues = new double[data[0].length];
+        //loop through all datapoints
+        for (double[] point : data) {
+            //loop through all attributes of each point
+            for (int attIter = 0; attIter < point.length; attIter++) {
 
+                //update max value for attribute if new max is found
+                if (point[attIter] > maxValues[attIter] * 10) {
+                    maxValues[attIter] = point[attIter] / 10;
+                }
+            }
+        }
+        this.maxVelocity = maxValues;
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-//
-
-//
-//    /**
-//     * finds the min and max values for all attributes in the data
-//     */
-//    private double[][] getMinMaxData(double[][] data) {
-//        //holds mins and maxs for all attributes
-//        //[0] holds mins [1] holds maxs
-//        double[][] minsAndMaxs = new double[2][data[0].length];
-//        //loop through all datapoints
-//        for (double[] point: data) {
-//            //loop through all attributes of each point
-//            for (int attIter = 0; attIter < point.length ; attIter++) {
-//
-//                //update min value for attribute if new min is found
-//                if(point[attIter] < minsAndMaxs[0][attIter]){
-//                    minsAndMaxs[0][attIter] = point[attIter];
-//                }
-//                //update max value for attribute if new max is found
-//                if(point[attIter] > minsAndMaxs[1][attIter]){
-//                    minsAndMaxs[1][attIter] = point[attIter];
-//                }
-//            }
-//        }
-//        return minsAndMaxs;
-//    }
-
