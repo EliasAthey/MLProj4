@@ -43,7 +43,7 @@ public class Driver {
             case "haberman":
                 dataset = Data.getHaberman();
                 break;
-            case "hrtu2":
+            case "htru2":
                 dataset = Data.getHtru2();
                 break;
             case "iris":
@@ -72,35 +72,35 @@ public class Driver {
      * @return true if arguments are valid
      */
     private static boolean verifyArgs(String[] args){
-        String boi = args[0];
-        if(!args[0].equals("aco") && !args[0].equals("dbs") && !args[0].equals("km") && !args[0].equals("nn") && !args[0].equals("pso")){
-            System.out.println("The first argument selects the algorithm");
-            System.out.println("Your input for the first argument was:\t" + args[0]);
-            System.out.println("Valid choices are: \n\taco\n\tdbs\n\tkm\n\tnn\n\tpso");
+        if(args.length == 0){
             return false;
         }
-        try{    Integer.parseInt(args[1]);}
+        if(!args[0].equals("aco") && !args[0].equals("dbs") && !args[0].equals("km") && !args[0].equals("nn") && !args[0].equals("pso")){
+            System.out.println("Invalid clustering algorithm.");
+            return false;
+        }
+        try{
+            int x = Integer.parseInt(args[1]);
+            if(x < 2) throw new NumberFormatException();
+        }
         catch (NumberFormatException e){
-            System.out.println("The second argument selects the number of clusters");
-            System.out.println("Your input for the second argument was:\t" + args[1]);
-            System.out.println("The second argument must be an integer");
+            System.out.println("Invalid number of clusters.");
             return false;
         }
         if(!args[2].equals("haberman") && !args[2].equals("hrtu2") && !args[2].equals("iris") && !args[2].equals("road") && !args[2].equals("wine")){
-            System.out.println("The third argument selects the dataset");
-            System.out.println("Your input for the third argument was:\t" + args[2]);
-            System.out.println("Valid choices are: \n\thaberman\n\thrtu2\n\tiris\n\troad\n\twine");
+            System.out.println("Invalid data set.");
             return false;
         }
-
         return true;
     }
 
     private static void displayHelpText(){
-        /**
-         * TODO
-         */
-        System.out.print("\nHelp Text\n");
+        System.out.println("Usage:\tjava -jar Clustering.jar [algorithm] [num-clusters] [data-set] [optional-parameters]");
+        System.out.println("[algorithm]:\taco, dbs, km, nn, pso");
+        System.out.println("[num-clusters]:\tan integer greater than 1");
+        System.out.println("[data-set]:\thaberman, hrtu2, iris, road, wine");
+        System.out.println("[optional-parameters]: TBD");
+        System.out.println();
     }
 
     /**
