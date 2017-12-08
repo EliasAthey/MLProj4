@@ -114,7 +114,7 @@ public class Driver {
 
         // compute cluster centers
         double[][] centers = new double[numClusters][data[0].length];
-        for(int clusterIter = 0; clusterIter < clusters.length; clusterIter++){
+        for(int clusterIter = 0; clusterIter < numClusters; clusterIter++){
             int numInCluster = 0;
             for(int dataIter = 0; dataIter < data.length; dataIter++){
 
@@ -127,14 +127,16 @@ public class Driver {
                 }
             }
             for(int clusterAttrIter = 0; clusterAttrIter < centers[clusterIter].length; clusterAttrIter++){
-                centers[clusterIter][clusterAttrIter] /= numInCluster;
+                if(numInCluster > 0){
+                    centers[clusterIter][clusterAttrIter] /= numInCluster;
+                }
             }
         }
 
         //compute objective function
         double objective = 0;
         for(int dataIter = 0; dataIter < data.length; dataIter++){
-            for(int clusterIter = 0; clusterIter < centers.length; clusterIter++){
+            for(int clusterIter = 0; clusterIter < numClusters; clusterIter++){
                 if(clusters[dataIter] == clusterIter){
                     double innerSum = 0;
                     for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
@@ -144,7 +146,6 @@ public class Driver {
                 }
             }
         }
-
         return objective;
     }
 }
