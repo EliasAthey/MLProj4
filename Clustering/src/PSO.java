@@ -1,3 +1,4 @@
+import java.lang.Math;
 /**
  * Particle Swarm Optimization clustering
  */
@@ -5,7 +6,9 @@ public class PSO extends Clustering{
     private Particle[] swarm;
     private final int swarmSize = 20;
     private Particle bestParticle;
-    private final double interita = .3;
+    private final double interita = .2;
+    private final double phiMax = 2;
+    private final double maxVelocity = 200.0;
     private int numClusters;
 
     @Override
@@ -103,6 +106,57 @@ public class PSO extends Clustering{
         return lables;
     }
 
+
+    /**
+     * updates velocity for all particles in swarm
+     */
+    private void updateVelocity() {
+        for (Particle particle: this.swarm) {
+            double phi1 = Math.random() * this.phiMax;
+            double phi2 = Math.random() * this.phiMax;
+            double[][] globalBest = this.bestParticle.getBestPosition();
+            double[][] personalBest = particle.getBestPosition();
+            double[][] newVelocity = particle.getVelocity();
+
+            for (int centIter = 0; centIter < globalBest.length; centIter++) {
+                for (int dimIter = 0; dimIter < globalBest[0].length; dimIter++) {
+                    globalBest[centIter][dimIter] = phi2 * (globalBest[centIter][dimIter] - particle.getPosition()[centIter][dimIter]);
+                    personalBest[centIter][dimIter] = phi1 * (personalBest[centIter][dimIter] - particle.getPosition()[centIter][dimIter]);
+                    newVelocity[centIter][dimIter] = this.interita * newVelocity[centIter][dimIter];
+                }
+            }
+            for (int centIter = 0; centIter < globalBest.length; centIter++) {
+                for (int dimIter = 0; dimIter < globalBest[0].length; dimIter++) {
+                    //compute the new value
+                    double newVel = newVelocity[centIter][dimIter] + personalBest[centIter][dimIter] +  globalBest[centIter][dimIter];
+                    //check if the new value is above max velocity to avoid runaway velocities
+                    if( newVel > this.maxVelocity) {
+                        newVel = this.maxVelocity;
+                    }
+                    newVelocity[centIter][dimIter] = newVel;
+                }
+            }
+            particle.setVelocity(newVelocity);
+
+        }
+    }
+
+    /**
+     * updates position for all particles in swarm
+     */
+    private void updatePosition() {
+        for (Particle particle: this.swarm) {
+
+            double[][] newPosition = particle.getPosition();
+            for (int centIter = 0; centIter < particle.getPosition().length; centIter++) {
+                for (int dimIter = 0; dimIter <  particle.getPosition()[0].length; dimIter++) {
+                    newPosition[centIter][dimIter] = newPosition[centIter][dimIter] +  particle.getVelocity()[centIter][dimIter];
+                }
+            }
+            particle.setPosition(newPosition);
+        }
+    }
+
     /**
      * finds the minimum value in the input array and returns the index to be used as a label
      */
@@ -118,6 +172,9 @@ public class PSO extends Clustering{
         }
         return minIndex;
     }
+
+
+
 }
 
 
