@@ -77,6 +77,9 @@ public class Ant implements Comparable{
                 if(this.weights[dataIter][clusterIter] == 1){
                     numInCluster++;
                     for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
+                        if(numInCluster == 1){
+                            this.clusterCenters[clusterIter][attrIter] = 0;
+                        }
                         this.clusterCenters[clusterIter][attrIter] += data[dataIter][attrIter];
                     }
                 }
@@ -148,6 +151,14 @@ public class Ant implements Comparable{
     }
 
     /**
+     * Sets the cluster centers, used by bestAnt in ACO
+     * @param centers the cluster centers
+     */
+    public void setClusterCenters(double[][] centers){
+        this.clusterCenters = centers;
+    }
+
+    /**
      * Sets the current objective value
      * @param value the current objective value
      */
@@ -169,6 +180,14 @@ public class Ant implements Comparable{
      */
     public int[][] getWeights(){
         return this.weights;
+    }
+
+    /**
+     * Sets the weights, used for the bestAnt in ACO
+     * @param weights the weights
+     */
+    public void setWeights(int[][] weights){
+        this.weights = weights;
     }
 
     @Override

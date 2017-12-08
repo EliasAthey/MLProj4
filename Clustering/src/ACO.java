@@ -35,7 +35,7 @@ public class ACO extends Clustering{
     /**
      * The maximum number of iterations to run
      */
-    private double maxIterations = 1000;
+    private double maxIterations = 10;
 
     /**
      * The rate of decay for pheromones
@@ -63,7 +63,7 @@ public class ACO extends Clustering{
 
         // the main algorithm loop
         int currentIter = 0;
-        int[][] bestAntWeights = null;
+        Ant bestAnt = new Ant(new int[data.length][numClusters], new double[numClusters][data[0].length], new int[data.length]);
         double bestObjectiveValue = Double.MAX_VALUE;
         do{
             // print best so far objective value
@@ -108,8 +108,10 @@ public class ACO extends Clustering{
 
             // compare current best with best so far, keep whichever minimizes objective value
             if(currentIter == 0 || ants.get(0).getCurrentObjectiveValue() < bestObjectiveValue){
-                bestAntWeights = ants.get(0).getWeights();
-                bestObjectiveValue = ants.get(0).getCurrentObjectiveValue();
+                bestAnt.setWeights(ants.get(0).getWeights());
+                bestAnt.setClusterCenters(ants.get(0).getClusterCenters());
+                bestAnt.setCurrentObjectiveValue(ants.get(0).getCurrentObjectiveValue());
+                bestObjectiveValue = bestAnt.getCurrentObjectiveValue();
             }
 
             // update pheromones
@@ -128,15 +130,16 @@ public class ACO extends Clustering{
         while(currentIter < this.maxIterations);
 
         // convert the best ant's weight matrix into an int[] and return
-        int[] finalClusters = new int[bestAntWeights.length];
-        for(int dataIter = 0; dataIter < bestAntWeights.length; dataIter++){
-            for(int clusterIter = 0; clusterIter < bestAntWeights[dataIter].length; clusterIter++){
-                if(bestAntWeights[dataIter][clusterIter] == 1){
+        int[] finalClusters = new int[bestAnt.getWeights().length];
+        for(int dataIter = 0; dataIter < bestAnt.getWeights().length; dataIter++){
+            for(int clusterIter = 0; clusterIter < bestAnt.getWeights()[dataIter].length; clusterIter++){
+                if(bestAnt.getWeights()[dataIter][clusterIter] == 1){
                     finalClusters[dataIter] = clusterIter;
                     break;
                 }
             }
         }
+
         return finalClusters;
     }
 
@@ -207,11 +210,13 @@ public class ACO extends Clustering{
         double objective = 0;
         for(int dataIter = 0; dataIter < data.length; dataIter++){
             for(int clusterIter = 0; clusterIter < clusterCenters.length; clusterIter++){
-                double innerSum = 0;
-                for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
-                    innerSum += Math.pow(data[dataIter][attrIter] - clusterCenters[clusterIter][attrIter], 2);
+                if(weights[dataIter][clusterIter] == 1){
+                    double innerSum = 0;
+                    for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
+                        innerSum += Math.pow(data[dataIter][attrIter] - clusterCenters[clusterIter][attrIter], 2);
+                    }
+                    objective += Math.sqrt(innerSum);
                 }
-                objective += (weights[dataIter][clusterIter] * Math.sqrt(innerSum));
             }
         }
         return objective;

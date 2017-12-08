@@ -136,7 +136,7 @@ public class Driver {
         //compute objective function
         double objective = 0;
         for(int dataIter = 0; dataIter < data.length; dataIter++){
-            for(int clusterIter = 0; clusterIter < centers.length; clusterIter++){
+            for(int clusterIter = 0; clusterIter < numClusters; clusterIter++){
                 if(clusters[dataIter] == clusterIter){
                     double innerSum = 0;
                     for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
