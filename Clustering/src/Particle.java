@@ -17,6 +17,8 @@ public class Particle {
     public Particle(double[][] position, double[][] velocity){
         this.position = position;
         this.velocity = velocity;
+        this.fitness = 100000000;
+        this.bestFitness = this.fitness;
     }
 
     /**
