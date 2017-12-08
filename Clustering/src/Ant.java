@@ -17,7 +17,7 @@ public class Ant implements Comparable{
      * [i][j] contains the average value for attribute j in cluster i
      * the vector [i] is the center of cluster i
      */
-    private double[][] clusterCenters;
+    private Double[][] clusterCenters;
 
     /**
      * A list of data point indices that this ant has clustered already
@@ -37,7 +37,7 @@ public class Ant implements Comparable{
      * @param clusterCenters dimensions: numClusters x numAttributes
      * @param memory dimension: numDataPoints
      */
-    public Ant(int[][] weights, double[][] clusterCenters, int[] memory){
+    public Ant(int[][] weights, Double[][] clusterCenters, int[] memory){
         this.weights = weights;
         this.clusterCenters = clusterCenters;
         this.memory = memory;
@@ -78,7 +78,7 @@ public class Ant implements Comparable{
                     numInCluster++;
                     for(int attrIter = 0; attrIter < data[dataIter].length; attrIter++){
                         if(numInCluster == 1){
-                            this.clusterCenters[clusterIter][attrIter] = 0;
+                            this.clusterCenters[clusterIter][attrIter] = 0.0;
                         }
                         this.clusterCenters[clusterIter][attrIter] += data[dataIter][attrIter];
                     }
@@ -120,7 +120,7 @@ public class Ant implements Comparable{
     public void resetClusterCenters(){
         for(int clusterIter = 0; clusterIter < this.clusterCenters.length; clusterIter++){
             for(int attrIter = 0; attrIter < this.clusterCenters[clusterIter].length; attrIter++){
-                this.clusterCenters[clusterIter][attrIter] = 0;
+                this.clusterCenters[clusterIter][attrIter] = 0.0;
             }
         }
     }
@@ -146,7 +146,7 @@ public class Ant implements Comparable{
      * Gets the cluster centers
      * @return the cluster centers
      */
-    public double[][] getClusterCenters(){
+    public Double[][] getClusterCenters(){
         return this.clusterCenters;
     }
 
@@ -154,7 +154,7 @@ public class Ant implements Comparable{
      * Sets the cluster centers, used by bestAnt in ACO
      * @param centers the cluster centers
      */
-    public void setClusterCenters(double[][] centers){
+    public void setClusterCenters(Double[][] centers){
         this.clusterCenters = centers;
     }
 

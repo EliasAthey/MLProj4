@@ -87,7 +87,7 @@ public class Driver {
             System.out.println("Invalid number of clusters.");
             return false;
         }
-        if(!args[2].equals("haberman") && !args[2].equals("hrtu2") && !args[2].equals("iris") && !args[2].equals("road") && !args[2].equals("wine")){
+        if(!args[2].equals("haberman") && !args[2].equals("htru2") && !args[2].equals("iris") && !args[2].equals("road") && !args[2].equals("wine")){
             System.out.println("Invalid data set.");
             return false;
         }
@@ -98,7 +98,7 @@ public class Driver {
         System.out.println("Usage:\tjava -jar Clustering.jar [algorithm] [num-clusters] [data-set] [optional-parameters]");
         System.out.println("[algorithm]:\taco, dbs, km, nn, pso");
         System.out.println("[num-clusters]:\tan integer greater than 1");
-        System.out.println("[data-set]:\thaberman, hrtu2, iris, road, wine");
+        System.out.println("[data-set]:\thaberman, htru2, iris, road, wine");
         System.out.println("[optional-parameters]: TBD");
         System.out.println();
     }
