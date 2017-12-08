@@ -1,14 +1,16 @@
 import java.lang.Math;
+import java.util.ArrayList;
+
 /**
  * Particle Swarm Optimization clustering
  */
 public class PSO extends Clustering{
     private Particle[] swarm;
-    private final int swarmSize = 20;
+    private final int swarmSize = 200;
     private Particle bestParticle;
-    private final double interita = .2;
-    private final double phiMax = 2;
-    private final double maxVelocity = 200.0;
+    private final double interita = .5;
+    private final double phiMax = .8;
+    private final double maxVelocity = 30.0;
     private int numClusters;
 
     @Override
@@ -19,13 +21,19 @@ public class PSO extends Clustering{
         this.numClusters = numClusters;
         int cycles = 0;
         initSwarm(data);       //initializes swarm with particles with random points as
-        while (cycles < 200) {                      // positions and random points as velocities 
+        while (cycles < 100) {                      // positions and random points as velocities
             calcFitness(data);              //calcs and assigns fitness to all particles in swarm
             updateVelocity();
             updatePosition();
             cycles++;
+            System.out.println("best fitness :\t" + this.bestParticle.getFitness());
         }
-        return null;
+
+        System.out.println("Final fitness :\t" + this.bestParticle.getBestFitness());
+        //return this.bestParticle.getBestPosition();
+
+        int[] labels = getLabels(this.bestParticle.getBestPosition(), data).stream().mapToInt(i -> i).toArray();;
+        return labels;
     }
 
     /**
@@ -52,7 +60,11 @@ public class PSO extends Clustering{
             }
             //create new particle with random position then add to swarm
             this.swarm [swarmIter] = new Particle(randPosition, randVelocity);
+            this.swarm [swarmIter].setBestPosition(this.swarm [swarmIter].getPosition());
+            this.swarm [swarmIter].setBestVelocity(this.swarm [swarmIter].getVelocity());
         }
+        //set best particle to a random particle to avoid null pointers on first round of calcFitness
+        this.bestParticle = this.swarm[(int) (Math.random() * this.swarmSize)];
     }
 
     private void calcFitness(double[][] data) {
@@ -76,7 +88,7 @@ public class PSO extends Clustering{
                 particle.setBestPosition(particle.getPosition());
             }
 
-            if(fitness < this.bestParticle.getFitness()){
+            if(particle.getFitness() < this.bestParticle.getFitness()){
                 this.bestParticle = particle;
             }
         }
@@ -165,7 +177,7 @@ public class PSO extends Clustering{
         int minIndex = 0;
         //loops through all distances and finds the index of the minimum value
         for (int distIter = 0; distIter < distances.length; distIter++) {
-            if (min < distances[distIter]){
+            if (min > distances[distIter]){
                 min = distances[distIter];
                 minIndex = distIter;
             }
@@ -173,6 +185,38 @@ public class PSO extends Clustering{
         return minIndex;
     }
 
+
+
+    /**
+     * assigns the closest centroid to every datapoint
+     */
+    private ArrayList<Integer> getLabels(double[][] centroids, double[][] data) {
+        ArrayList<Integer> labels = new ArrayList<>();
+
+        for (double[] point: data) {
+            labels.add((Integer) labelPoint(point, centroids));
+        }
+        return labels;
+    }
+
+    /**
+     * finds centroid closest to given point and labels that point
+     */
+    private int labelPoint(double[] point, double[][] centroids) {
+        double[] distances = new double[centroids.length];
+
+        for (int centIter = 0; centIter < centroids.length; centIter++) {
+            double sum = 0;
+
+            for (int dimIter = 0; dimIter < centroids[0].length; dimIter++) {
+                //square the difference in each dimension then add it to the sum
+                sum += Math.pow( point[dimIter] - centroids[centIter][dimIter], 2);
+            }
+            distances[centIter] = Math.sqrt(sum);
+        }
+        //return the index of the minimum value to be used as a label
+        return findMinIndex(distances);
+    }
 
 
 }
