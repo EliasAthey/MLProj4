@@ -38,7 +38,7 @@ public class Driver {
         }
 
         // set the data set to cluster
-        double[][] dataset = null;
+        Double[][] dataset = null;
         switch(args[2]){
             case "haberman":
                 dataset = Data.getHaberman();
@@ -110,7 +110,7 @@ public class Driver {
      * @param numClusters the number of clusters
      * @return an objective value of clustering performance
      */
-    private static double evaluateClusters(double[][] data, int[] clusters, int numClusters){
+    private static double evaluateClusters(Double[][] data, int[] clusters, int numClusters){
 
         // compute cluster centers
         double[][] centers = new double[numClusters][data[0].length];

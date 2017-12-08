@@ -9,5 +9,5 @@ public abstract class Clustering {
      * @param numClusters the number of clusters
      * @return an array of ints, each index corresponds to a point in the data array; the value is the cluster
      */
-    public abstract int[] cluster(double[][] data, int numClusters);
+    public abstract int[] cluster(Double[][] data, int numClusters);
 }

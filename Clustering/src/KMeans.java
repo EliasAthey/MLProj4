@@ -10,7 +10,7 @@ public class KMeans  extends Clustering{
      * Clusters data via the K-means Algorithm
      */
     @Override
-    public int[] cluster(double[][] data, int numClusters){
+    public int[] cluster(Double[][] data, int numClusters){
         int cycles =0 ;
         ArrayList<Integer> labels = null;
         double[][] centroids = initCentroids(data, numClusters);
@@ -26,12 +26,16 @@ public class KMeans  extends Clustering{
     /**
      * initializes centroids to random datapoints
      */
-    public double[][] initCentroids(double[][] data, int numClusters){
+    public double[][] initCentroids(Double[][] data, int numClusters){
         double[][] centroids = new double[numClusters][];
 
         for (int centIter = 0; centIter < numClusters; centIter++) {
             //pick a random datapoint from the sample and make it a centroid
-            centroids[centIter] = data[(int)(Math.random() * data.length)];
+            double[] dataValue = new double[data[0].length];
+            for(int attrIter = 0; attrIter < dataValue.length; attrIter++){
+                dataValue[attrIter] = data[(int) (Math.random() * data.length)][attrIter];
+            }
+            centroids[centIter] = dataValue;
         }
         return centroids;
     }
@@ -39,11 +43,11 @@ public class KMeans  extends Clustering{
     /**
      * assigns the closest centroid to every datapoint
      */
-    private ArrayList<Integer> getLabels(double[][] centroids, double[][] data) {
+    private ArrayList<Integer> getLabels(double[][] centroids, Double[][] data) {
         ArrayList<Integer> labels = new ArrayList<>();
 
-        for (double[] point: data) {
-            labels.add((Integer) labelPoint(point, centroids));
+        for (Double[] point: data) {
+            labels.add(labelPoint(point, centroids));
         }
         return labels;
     }
@@ -51,7 +55,7 @@ public class KMeans  extends Clustering{
     /**
      * finds centroid closest to given point and labels that point
      */
-    private int labelPoint(double[] point, double[][] centroids) {
+    private int labelPoint(Double[] point, double[][] centroids) {
         double[] distances = new double[centroids.length];
 
         for (int centIter = 0; centIter < centroids.length; centIter++) {
@@ -70,7 +74,7 @@ public class KMeans  extends Clustering{
     /**
      * create a new set of centroids by averaging position of all points associated with each centroid
      */
-    private double[][] getCentroids(ArrayList<Integer> labels, double[][] data, int numClusters) {
+    private double[][] getCentroids(ArrayList<Integer> labels, Double[][] data, int numClusters) {
 
         double[][] newCentroids = new double[numClusters][];
         int[] divisors = new int[numClusters];

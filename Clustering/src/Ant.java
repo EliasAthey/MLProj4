@@ -68,7 +68,7 @@ public class Ant implements Comparable{
      * Calculates the cluster centers for this ant
      * @param data the data points that were clustered
      */
-    public void calculateClusterCenters(double[][] data){
+    public void calculateClusterCenters(Double[][] data){
         for(int clusterIter = 0; clusterIter < this.clusterCenters.length; clusterIter++){
             int numInCluster = 0;
             for(int dataIter = 0; dataIter < data.length; dataIter++){
