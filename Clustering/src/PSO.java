@@ -14,9 +14,6 @@ public class PSO extends Clustering{
     private int numClusters;
 
     @Override
-    /**
-     * TODO
-     */
     public int[] cluster(double[][] data, int numClusters){
         this.numClusters = numClusters;
         int cycles = 0;
@@ -67,6 +64,9 @@ public class PSO extends Clustering{
         this.bestParticle = this.swarm[(int) (Math.random() * this.swarmSize)];
     }
 
+    /**
+     * for all particles calculate the average distance all datapoints are away from their closest centroid
+     */
     private void calcFitness(double[][] data) {
         for (Particle particle: this.swarm) {
             int[] labels = makeLables(particle, data);
@@ -93,31 +93,6 @@ public class PSO extends Clustering{
             }
         }
     }
-
-    private int[] makeLables(Particle particle, double[][] data) {
-        int[] lables = new int[data.length];
-        double[][] centroids = particle.getPosition();
-
-        for (int pointIter = 0; pointIter < data.length; pointIter++) {
-
-            //holds the distances from a point to all centroids
-            double[] distances = new double[centroids.length];
-            //find distance from point to all centroids
-            for (int centIter = 0; centIter < centroids.length; centIter++) {
-
-                double sum =0;
-                for (int dimIter = 0; dimIter < centroids[0].length; dimIter++) {
-                    //square the difference in each dimension then add it to the sum
-                    sum += Math.pow(data[pointIter][dimIter] - centroids[centIter][dimIter], 2);
-                }
-                distances[centIter] = Math.sqrt(sum);
-            }
-            lables[pointIter] = findMinIndex(distances);
-        }
-
-        return lables;
-    }
-
 
     /**
      * updates velocity for all particles in swarm
@@ -170,36 +145,6 @@ public class PSO extends Clustering{
     }
 
     /**
-     * finds the minimum value in the input array and returns the index to be used as a label
-     */
-    private int findMinIndex(double[] distances) {
-        double min = distances[0];
-        int minIndex = 0;
-        //loops through all distances and finds the index of the minimum value
-        for (int distIter = 0; distIter < distances.length; distIter++) {
-            if (min > distances[distIter]){
-                min = distances[distIter];
-                minIndex = distIter;
-            }
-        }
-        return minIndex;
-    }
-
-
-
-    /**
-     * assigns the closest centroid to every datapoint
-     */
-    private ArrayList<Integer> getLabels(double[][] centroids, double[][] data) {
-        ArrayList<Integer> labels = new ArrayList<>();
-
-        for (double[] point: data) {
-            labels.add((Integer) labelPoint(point, centroids));
-        }
-        return labels;
-    }
-
-    /**
      * finds centroid closest to given point and labels that point
      */
     private int labelPoint(double[] point, double[][] centroids) {
@@ -218,6 +163,61 @@ public class PSO extends Clustering{
         return findMinIndex(distances);
     }
 
+    /**
+     * assigns the closest centroid to every datapoint
+     */
+    private ArrayList<Integer> getLabels(double[][] centroids, double[][] data) {
+        ArrayList<Integer> labels = new ArrayList<>();
+
+        for (double[] point: data) {
+            labels.add(labelPoint(point, centroids));
+        }
+        return labels;
+    }
+
+    /**
+     * assigns the closest centroid to every datapoint
+     */
+    private int[] makeLables(Particle particle, double[][] data) {
+        int[] lables = new int[data.length];
+        double[][] centroids = particle.getPosition();
+
+        for (int pointIter = 0; pointIter < data.length; pointIter++) {
+
+            //holds the distances from a point to all centroids
+            double[] distances = new double[centroids.length];
+            //find distance from point to all centroids
+            for (int centIter = 0; centIter < centroids.length; centIter++) {
+
+                double sum =0;
+                for (int dimIter = 0; dimIter < centroids[0].length; dimIter++) {
+                    //square the difference in each dimension then add it to the sum
+                    sum += Math.pow(data[pointIter][dimIter] - centroids[centIter][dimIter], 2);
+                }
+                distances[centIter] = Math.sqrt(sum);
+            }
+            lables[pointIter] = findMinIndex(distances);
+        }
+
+        return lables;
+    }
+
+    /**
+     * finds the minimum value in the input array and returns the index to be used as a label
+     */
+    private int findMinIndex(double[] distances) {
+        double min = distances[0];
+        int minIndex = 0;
+        //loops through all distances and finds the index of the minimum value
+        for (int distIter = 0; distIter < distances.length; distIter++) {
+            if (min > distances[distIter]){
+                min = distances[distIter];
+                minIndex = distIter;
+            }
+        }
+        return minIndex;
+    }
+
 
 }
 
@@ -232,7 +232,7 @@ public class PSO extends Clustering{
 
 
 
-
+//
 
 //
 //    /**
