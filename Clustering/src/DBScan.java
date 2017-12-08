@@ -7,7 +7,7 @@ public class DBScan extends Clustering{
     /**
      * TODO
      */
-    public int[] cluster(double[][] data, int numClusters){
+    public int[] cluster(Double[][] data, int numClusters){
         return null;
     }
 }
