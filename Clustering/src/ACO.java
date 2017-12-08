@@ -216,6 +216,7 @@ public class ACO extends Clustering{
                         innerSum += Math.pow(data[dataIter][attrIter] - clusterCenters[clusterIter][attrIter], 2);
                     }
                     objective += Math.sqrt(innerSum);
+                    break;
                 }
             }
         }

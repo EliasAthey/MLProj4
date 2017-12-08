@@ -143,6 +143,7 @@ public class Driver {
                         innerSum += Math.pow(data[dataIter][attrIter] - centers[clusterIter][attrIter], 2);
                     }
                     objective += Math.sqrt(innerSum);
+                    break;
                 }
             }
         }
