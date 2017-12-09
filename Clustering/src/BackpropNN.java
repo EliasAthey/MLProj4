@@ -13,6 +13,11 @@ public class BackpropNN extends Clustering{
     private int numOutputs;
 
     /**
+     * the number of inputs
+     */
+    private int numInputs;
+
+    /**
      * number of hidden layers, default is 1
      */
     private int numHiddenLayers = 1;
@@ -51,30 +56,30 @@ public class BackpropNN extends Clustering{
         this.numOutputs = numClusters;
 
         // the number of inputs
-        int numInputs = data[0].length;
+        this.numInputs = data[0].length;
 
-        // the average of the inputs, used to update weights
+        // the average of the inputs to each node, used to update weights
         ArrayList<Double> avgInput = new ArrayList<>();
-        for(int pointIter = 0; pointIter < data.length; pointIter++){
-            for(int attrIter = 0 ; attrIter < data[pointIter].length; attrIter++){
-                if(pointIter == 0){
-                    avgInput.add(attrIter, data[pointIter][attrIter]);
-                }
-                else{
-                    double temp = avgInput.get(attrIter) + data[pointIter][attrIter];
-                    avgInput.remove(attrIter);
-                    avgInput.add(attrIter, temp);
-                }
-            }
-        }
-        for(int inputIter = 0; inputIter < avgInput.size(); inputIter++){
-            double temp = avgInput.get(inputIter) / data.length;
-            avgInput.remove(inputIter);
-            avgInput.add(inputIter, temp);
-        }
+//        for(int pointIter = 0; pointIter < data.length; pointIter++){
+//            for(int attrIter = 0 ; attrIter < data[pointIter].length; attrIter++){
+//                if(pointIter == 0){
+//                    avgInput.add(attrIter, data[pointIter][attrIter]);
+//                }
+//                else{
+//                    double temp = avgInput.get(attrIter) + data[pointIter][attrIter];
+//                    avgInput.remove(attrIter);
+//                    avgInput.add(attrIter, temp);
+//                }
+//            }
+//        }
+//        for(int inputIter = 0; inputIter < avgInput.size(); inputIter++){
+//            double temp = avgInput.get(inputIter) / data.length;
+//            avgInput.remove(inputIter);
+//            avgInput.add(inputIter, temp);
+//        }
 
         // the total number of weights
-        int numWeights = this.calculateNumWeights(numInputs);
+        int numWeights = this.calculateNumWeights(this.numInputs);
 
         // the best clustering found so far and associated error
         int[] bestClustering = new int[numClusters];
@@ -101,8 +106,9 @@ public class BackpropNN extends Clustering{
             int[] clustering = new int[data.length];
             this.hiddenDerivatives = new Double[this.numHiddenNodesPerLayer[0]];
             this.outputDerivatives = new Double[this.numOutputs];
+            avgInput.clear();
             for(int pointIter = 0; pointIter < data.length; pointIter++){
-                clustering[pointIter] = this.sendThroughNetwork(data[pointIter], weights);
+                clustering[pointIter] = this.sendThroughNetwork(data[pointIter], weights, avgInput);
             }
 
             // Determine error and backpropogate
@@ -183,7 +189,7 @@ public class BackpropNN extends Clustering{
      * @param dataPoint the data point to cluster
      * @return an int representing the cluster chosen for the given data point
      */
-    private int sendThroughNetwork(Double[] dataPoint, ArrayList<Double> weights){
+    private int sendThroughNetwork(Double[] dataPoint, ArrayList<Double> weights, ArrayList<Double> avgInputs){
         // used as the values passed between the layers
         ArrayList<Double> currentLayer = new ArrayList<>();
 
@@ -216,6 +222,7 @@ public class BackpropNN extends Clustering{
                     nodeIter++;
                 }
                 for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
+                    avgInputs.add(currentLayer.get(valueIter));
                     double sigmoid = this.sigmoid(currentLayer.get(valueIter));
                     currentLayer.remove(valueIter);
                     currentLayer.add(valueIter, sigmoid);
@@ -256,6 +263,7 @@ public class BackpropNN extends Clustering{
                     nodeIter++;
                 }
                 for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
+                    avgInputs.add(currentLayer.get(valueIter));
                     double sigmoid = this.sigmoid(currentLayer.get(valueIter));
                     currentLayer.remove(valueIter);
                     currentLayer.add(valueIter, sigmoid);
@@ -281,6 +289,14 @@ public class BackpropNN extends Clustering{
 //                    }
 //                }
 //            }
+        }
+
+        // average inputs to each node
+        for(int inputIter = 0; inputIter < avgInputs.size(); inputIter++){
+            double temp = avgInputs.get(inputIter);
+            temp /= (this.numHiddenNodesPerLayer[0] + numOutputs);
+            avgInputs.remove(inputIter);
+            avgInputs.add(inputIter, temp);
         }
 
         // Calculate chosen cluster based on highest output node
@@ -328,7 +344,38 @@ public class BackpropNN extends Clustering{
      */
     private void backpropogate(double error, ArrayList<Double> weights, ArrayList<Double> prevWeightChange, ArrayList<Double> inputs){
         ArrayList<Double> newWeightChange = new ArrayList<>();
-        double[] deltas = this.calculateDeltas(error, weights, inputs.size());
+        double[] deltas = this.calculateDeltas(error, weights, this.numInputs);
+
+        // update each weight
+        for(int weightIter = 0; weightIter < weights.size(); weightIter++){
+            double weightChange = 0.0;
+
+            // first layer of weights
+            if(weightIter < this.numInputs * this.numHiddenNodesPerLayer[0]){
+                int deltaIndex = this.numInputs + (weightIter % (this.numHiddenNodesPerLayer[0] - 1));
+                int inputIndex = weightIter % (this.numHiddenNodesPerLayer[0] - 1);
+                weightChange += ((1 - this.momentum) * this.learningRate * deltas[deltaIndex] * inputs.get(inputIndex));
+                weightChange += (this.momentum * prevWeightChange.get(weightIter));
+                double originalWeight = weights.get(weightIter);
+                weights.remove(weightIter);
+                weights.add(weightIter, originalWeight + weightChange);
+                prevWeightChange.remove(weightIter);
+                prevWeightChange.add(weightIter, weightChange);
+            }
+
+            // second/last layer of weights
+            else{
+                int deltaIndex = this.numInputs + this.numHiddenNodesPerLayer[0] + (weightIter % (this.numOutputs - 1));
+                int inputIndex = this.numHiddenNodesPerLayer[0] + (weightIter % (this.numOutputs - 1));
+                weightChange += ((1 - this.momentum) * this.learningRate * deltas[deltaIndex] * inputs.get(inputIndex));
+                weightChange += (this.momentum * prevWeightChange.get(weightIter));
+                double originalWeight = weights.get(weightIter);
+                weights.remove(weightIter);
+                weights.add(weightIter, originalWeight + weightChange);
+                prevWeightChange.remove(weightIter);
+                prevWeightChange.add(weightIter, weightChange);
+            }
+        }
     }
 
     /**
