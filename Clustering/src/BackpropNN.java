@@ -82,7 +82,7 @@ public class BackpropNN extends Clustering{
         }
 
         // initialize network and start loop
-        this.initializeNetwork(weights, numInputs);
+        this.initializeNetwork(weights, numWeights);
         boolean hasConverged = false;
         int loopIter = 0;
         do{
@@ -171,22 +171,129 @@ public class BackpropNN extends Clustering{
      * @return an int representing the cluster chosen for the given data point
      */
     private int sendThroughNetwork(Double[] dataPoint, ArrayList<Double> weights){
-        // used and reused as the passed values between the layers, initialize to the input values
+        // used as the values passed between the layers
         ArrayList<Double> currentLayer = new ArrayList<>();
-        for(int attrIter = 0; attrIter < dataPoint.length; attrIter++){
-            currentLayer.add(attrIter, dataPoint[attrIter]);
-        }
 
         // send values through each layer of the network, layerIter is really a between layer iter
         for(int layerIter = 0; layerIter < this.numHiddenLayers + 1; layerIter++){
+            // from input layer to first hidden layer
             if(layerIter == 0){
-                int numWeights = currentLayer.size() * this.numHiddenNodesPerLayer[0];
+                int numWeights = dataPoint.length * this.numHiddenNodesPerLayer[0];
+                int inputIter = 0;
                 for(int weightIter = 0; weightIter < numWeights; weightIter++){
+                    currentLayer.add(dataPoint[inputIter] * weights.get(weightIter));
+                    if((weightIter + 1) % this.numHiddenNodesPerLayer[0] == 0){
+                        inputIter++;
+                    }
+                }
 
+                // sum values in currentLayer as input for the first hidden layer and compute sigmoid
+                int nodeIter = 0;
+                for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
+                    if(valueIter % this.numHiddenNodesPerLayer[0] == 0){
+                        nodeIter = 0;
+                    }
+                    if(valueIter >= this.numHiddenNodesPerLayer[0]){
+                        double sum = currentLayer.get(valueIter) + currentLayer.get(nodeIter);
+                        currentLayer.remove(valueIter);
+                        valueIter--;
+                        currentLayer.remove(nodeIter);
+                        currentLayer.add(nodeIter, sum);
+                    }
+                    nodeIter++;
+                }
+                for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
+                    double sigmoid = this.sigmoid(currentLayer.get(valueIter));
+                    currentLayer.remove(valueIter);
+                    currentLayer.add(valueIter, sigmoid);
                 }
             }
+            // from last hidden layer to output layer
+            else if(layerIter == this.numHiddenLayers){
+                int numWeights = this.numHiddenNodesPerLayer[this.numHiddenLayers - 1] * this.numOutputs;
+                int endingWeight = weights.size();
+                int startingWeight = endingWeight - numWeights;
+                int inputIter = 0;
+                double[] inputs = new double[currentLayer.size()];
+                for(int iter = 0; iter < inputs.length; iter++){
+                    inputs[iter] = currentLayer.get(iter);
+                }
+                currentLayer.clear();
+                for(int weightIter = startingWeight; weightIter < endingWeight; weightIter++){
+                    currentLayer.add(inputs[inputIter] * weights.get(weightIter));
+                    if((weightIter + 1) % this.numHiddenNodesPerLayer[this.numHiddenLayers - 1] == 0){
+                        inputIter++;
+                    }
+                }
+
+                // sum values in currentLayer as input for the first hidden layer and compute sigmoid
+                int nodeIter = 0;
+                for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
+                    if(valueIter % this.numHiddenNodesPerLayer[this.numHiddenLayers - 1] == 0){
+                        nodeIter = 0;
+                    }
+                    if(valueIter >= this.numHiddenNodesPerLayer[this.numHiddenLayers - 1]) {
+                        double temp = currentLayer.get(valueIter) + currentLayer.get(nodeIter);
+                        currentLayer.remove(valueIter);
+                        valueIter--;
+                        currentLayer.remove(nodeIter);
+                        currentLayer.add(nodeIter, temp);
+                    }
+                    nodeIter++;
+                }
+                for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
+                    double sigmoid = this.sigmoid(currentLayer.get(valueIter));
+                    currentLayer.remove(valueIter);
+                    currentLayer.add(valueIter, sigmoid);
+                }
+            }
+            // this got really complicated really fast, not needed with only 1 hidden layer, so Im sticking to 1 hidden layer
+            // from hidden layer to next hidden layer
+//            else{
+//                int numWeights = this.numHiddenNodesPerLayer[layerIter - 1] * this.numHiddenNodesPerLayer[layerIter];
+//                int endingWeight = dataPoint.length * this.numHiddenNodesPerLayer[0];
+//                int startingWeight = endingWeight - numWeights;
+//                int inputIter = 0;
+//                double[] inputs = new double[currentLayer.size()];
+//                for(int iter = 0; iter < inputs.length; iter++){
+//                    inputs[iter] = currentLayer.get(iter);
+//                }
+//                currentLayer.clear();
+//                for(int weightIter = startingWeight; weightIter < endingWeight; weightIter++){
+//                    currentLayer.add(inputs[inputIter] * weights.get(weightIter));
+//                    if((weightIter + 1) % this.numHiddenNodesPerLayer[this.numHiddenLayers - 1] == 0){
+//                        inputIter++;
+//                    }
+//                }
+//            }
         }
-        return 0;
+
+        // Calculate chosen cluster based on highest output node
+        int maxIndex = 0;
+        for(int iter = 1; iter < currentLayer.size(); iter++){
+            if(currentLayer.get(iter) > currentLayer.get(maxIndex)){
+                maxIndex = iter;
+            }
+        }
+        return maxIndex;
+    }
+
+    /**
+     * Computes the sigmoid function
+     * @param input the input
+     * @return the output
+     */
+    private double sigmoid(double input){
+        return 1 / (1 + Math.exp(-1 * input));
+    }
+
+    /**
+     * Computes the sigmoid function
+     * @param input the input (the output of the sigmoid function of the same input)
+     * @return the output
+     */
+    private double sigmoidDerivative(double input){
+        return input * (1 - input);
     }
 
     /**
