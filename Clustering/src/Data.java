@@ -48,7 +48,7 @@ public class Data {
      */
     public static Double[][] getRoad(){
         Scanner fileScanner = new Scanner(Thread.currentThread().getContextClassLoader().getResourceAsStream("3D_spatial_road_network_denmark.data"));
-        return Data.getDataset(fileScanner, 100000, 4);
+        return Data.getDataset(fileScanner, 50000, 4);
     }
 
     /**

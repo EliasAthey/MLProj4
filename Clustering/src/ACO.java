@@ -1,7 +1,9 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
+import com.sun.deploy.util.OrderedHashSet;
+import javafx.beans.binding.MapBinding;
+import javafx.collections.ObservableMap;
+
+import javax.sound.midi.Sequence;
+import java.util.*;
 
 /**
  * Ant Colony Optimization base clustering
@@ -12,13 +14,13 @@ public class ACO extends Clustering{
      * The number of ants in the system
      * Tunable
      */
-    private int numAnts = 100;
+    private int numAnts = 5;
 
     /**
      * Number of chosen elitist ants (only ants that can drop pheromone)
      * Tunable
      */
-    private int numElite = 10;
+    private int numElite = 1;
 
     /**
      * The probability that an ant will exploit the pheromone levels rather than explore the space
@@ -76,13 +78,18 @@ public class ACO extends Clustering{
                 ants.get(antIter).resetClusterCenters();
                 ants.get(antIter).resetWeights();
 
+                // randomly sort data indices in a list used to pick data points
+                ArrayList<Integer> availablePoints = new ArrayList<>();
+                for(int pointIter = 0; pointIter < data.length; pointIter++){
+                    availablePoints.add(pointIter);
+                }
+                Collections.shuffle(availablePoints);
+
                 // cluster each data point
+                int loopIter = 0;
                 while(!ants.get(antIter).isMemoryFull()){
-                    // select random data point not in memory
-                    int dataPointIndex = (int)(Math.random() * data.length);
-                    while(ants.get(antIter).getMemory()[dataPointIndex] == 1){
-                        dataPointIndex = (int)(Math.random() * data.length);
-                    }
+                    // select data point from randomly ordered set
+                    int dataPointIndex = availablePoints.get(loopIter);
 
                     // choose the cluster
                     int clusterForPoint;
@@ -97,6 +104,8 @@ public class ACO extends Clustering{
                     // put point in determined cluster (update weights and memory) and update centers
                     ants.get(antIter).putPointInCluster(dataPointIndex, clusterForPoint);
                     ants.get(antIter).calculateClusterCenters(data);
+
+                    loopIter++;
                 }
 
                 // update objective value
