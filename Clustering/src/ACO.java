@@ -58,12 +58,12 @@ public class ACO extends Clustering{
         // the list of ants
         ArrayList<Ant> ants = new ArrayList<>();
         for(int antIter = 0; antIter < this.numAnts; antIter++){
-            ants.add(new Ant(new int[data.length][numClusters], new Double[numClusters][data[0].length], new int[data.length]));
+            ants.add(new Ant(new int[data.length][numClusters], new double[numClusters][data[0].length], new int[data.length]));
         }
 
         // the main algorithm loop
         int currentIter = 0;
-        Ant bestAnt = new Ant(new int[data.length][numClusters], new Double[numClusters][data[0].length], new int[data.length]);
+        Ant bestAnt = new Ant(new int[data.length][numClusters], new double[numClusters][data[0].length], new int[data.length]);
         double bestObjectiveValue = Double.MAX_VALUE;
         do{
             // print best so far objective value
@@ -149,7 +149,7 @@ public class ACO extends Clustering{
      * @param clusterCenters the cluster center matrix
      * @return the index of the cluster
      */
-    private int exploit(Double[] datapoint, Double[][] clusterCenters, Double[] pheromones){
+    private int exploit(Double[] datapoint, double[][] clusterCenters, Double[] pheromones){
         int maximizingCluster = 0;
         double currentMaximum = -1;
         for(int clusterIter = 0; clusterIter < clusterCenters.length; clusterIter++){
@@ -168,7 +168,7 @@ public class ACO extends Clustering{
      * @param clusterCenters the cluster center matrix
      * @return the index of the cluster
      */
-    private int explore(Double[] datapoint, Double[][] clusterCenters, Double[] pheromones){
+    private int explore(Double[] datapoint, double[][] clusterCenters, Double[] pheromones){
         int maximizingCluster = 0;
         double currentMaximumProb = -1;
         for(int clusterProbsIter = 0 ; clusterProbsIter < clusterCenters.length; clusterProbsIter++){
@@ -191,7 +191,7 @@ public class ACO extends Clustering{
      * @param clusterCenter the cluster center
      * @return the inverse distance
      */
-    private double distanceFromCluster(Double[] datapoint, Double[] clusterCenter){
+    private double distanceFromCluster(Double[] datapoint, double[] clusterCenter){
         double sum = 0;
         for(int attrIter = 0; attrIter < datapoint.length; attrIter++){
             sum += Math.pow((datapoint[attrIter] - clusterCenter[attrIter]), 2);
@@ -206,7 +206,7 @@ public class ACO extends Clustering{
      * @param clusterCenters the ants cluster center matrix
      * @return the ants objective value
      */
-    private double evaluateObjectiveFunction(Double[][] data, int[][] weights, Double[][] clusterCenters){
+    private double evaluateObjectiveFunction(Double[][] data, int[][] weights, double[][] clusterCenters){
         double objective = 0;
         for(int dataIter = 0; dataIter < data.length; dataIter++){
             for(int clusterIter = 0; clusterIter < clusterCenters.length; clusterIter++){
