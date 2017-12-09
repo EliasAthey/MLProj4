@@ -341,29 +341,29 @@ public class BackpropNN extends Clustering{
         // initialize delta array
         int numNodes = numInputs;
         for(int nodeIter = 0; nodeIter < this.numHiddenLayers; nodeIter++){
-            numInputs += this.numHiddenNodesPerLayer[nodeIter];
+            numNodes += this.numHiddenNodesPerLayer[nodeIter];
         }
         numNodes += this.numOutputs;
         double[] deltas = new double[numNodes];
 
         // calculate output node deltas
-        for(int outIter = (numNodes - 1) - this.numOutputs; outIter < numNodes; outIter++){
-            deltas[outIter] = -1 * error * this.outputDerivatives[outIter];
+        for(int outIter = numNodes - this.numOutputs; outIter < numNodes; outIter++){
+            deltas[outIter] = -1 * error * this.outputDerivatives[outIter - numNodes + this.numOutputs];
         }
 
         // calculate hidden node deltas
         for(int layerIter = this.numHiddenLayers - 1; layerIter >= 0; layerIter--){
-            int startIndex = (numNodes - 1) - this.numOutputs - this.numHiddenNodesPerLayer[layerIter];
+            int startIndex = numNodes - this.numOutputs - this.numHiddenNodesPerLayer[layerIter];
             int endIndex = layerIter == this.numHiddenLayers - 1 ?
-                    (numNodes - 1) - this.numOutputs : (numNodes - 1) - this.numOutputs - this.numHiddenNodesPerLayer[layerIter + 1];
+                    numNodes - this.numOutputs : numNodes - this.numOutputs - this.numHiddenNodesPerLayer[layerIter + 1];
             for(int hiddenIter = startIndex; hiddenIter < endIndex; hiddenIter++){
                 double downstreamSum = 0.0;
                 if(layerIter == this.numHiddenLayers - 1){
-                    int outputIter = 0;
                     int multiple = (hiddenIter - startIndex) * this.numOutputs;
-                    int weightIndex = (weights.size() - 1) - (this.numHiddenNodesPerLayer[layerIter] * this.numOutputs) + multiple;
-                    while(outputIter < this.numOutputs){
-                        outputIter++;
+                    int weightIndex = weights.size() - 1 - (this.numHiddenNodesPerLayer[layerIter] * this.numOutputs) + multiple;
+                    int outputIter = deltas.length;
+                    while(outputIter >= deltas.length - this.numOutputs){
+                        outputIter--;
                         downstreamSum += (deltas[outputIter] * weights.get(weightIndex));
                         weightIndex++;
                     }
@@ -383,7 +383,7 @@ public class BackpropNN extends Clustering{
 //                    }
                 }
                 int derivativeIndex = this.hiddenDerivatives.length;
-                for(int hiddenLayerIter = this.numHiddenLayers; hiddenLayerIter > layerIter; hiddenLayerIter--){
+                for(int hiddenLayerIter = this.numHiddenLayers - 1; hiddenLayerIter >= layerIter; hiddenLayerIter--){
                     derivativeIndex -= this.numHiddenNodesPerLayer[hiddenLayerIter];
                 }
                 derivativeIndex += (hiddenIter - startIndex);
@@ -391,6 +391,7 @@ public class BackpropNN extends Clustering{
             }
         }
 
+        // the first X entries will be zero, where X is the number of inputs
         return deltas;
     }
 
