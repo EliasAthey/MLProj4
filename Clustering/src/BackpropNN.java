@@ -30,12 +30,12 @@ public class BackpropNN extends Clustering{
     /**
      * the learning rate
      */
-    private double learningRate = 0.5;
+    private double learningRate = 0.1;
 
     /**
      * the momentum
      */
-    private double momentum = 0.9;
+    private double momentum = 0.5;
 
     /**
      * holds the computed derivatives fro hidden layer
