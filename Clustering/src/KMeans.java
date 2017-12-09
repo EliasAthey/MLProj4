@@ -20,7 +20,8 @@ public class KMeans  extends Clustering{
             cycles++;
         }
         //convert from ArrayList<Integer> to int[]
-        return  labels.stream().mapToInt(i -> i).toArray();
+        int[]boi = labels.stream().mapToInt(i -> i).toArray();
+        return  boi;
     }
 
     /**
@@ -76,7 +77,9 @@ public class KMeans  extends Clustering{
      */
     private double[][] getCentroids(ArrayList<Integer> labels, Double[][] data, int numClusters) {
 
-        double[][] newCentroids = new double[numClusters][];
+        //init all values to 0.0
+        double[][] newCentroids = new double[numClusters][data[0].length];
+
         int[] divisors = new int[numClusters];
         //loop thru each datapoint
         for (int dataIter = 0; dataIter < data.length; dataIter++) {
@@ -106,7 +109,7 @@ public class KMeans  extends Clustering{
         int minIndex = 0;
         //loops through all distances and finds the index of the minimum value
         for (int distIter = 0; distIter < distances.length; distIter++) {
-            if (min < distances[distIter]){
+            if (min > distances[distIter]){
                 min = distances[distIter];
                 minIndex = distIter;
             }
