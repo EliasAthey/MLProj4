@@ -328,6 +328,70 @@ public class BackpropNN extends Clustering{
      */
     private void backpropogate(double error, ArrayList<Double> weights, ArrayList<Double> prevWeightChange, ArrayList<Double> inputs){
         ArrayList<Double> newWeightChange = new ArrayList<>();
+        double[] deltas = this.calculateDeltas(error, weights, inputs.size());
+    }
+
+    /**
+     * Calculates the delta values for each node in the network
+     * @param error the fitness of the clustering
+     * @param weights the weights of the network
+     * @return delta values for each node in the network
+     */
+    private double[] calculateDeltas(double error, ArrayList<Double> weights, int numInputs){
+        // initialize delta array
+        int numNodes = numInputs;
+        for(int nodeIter = 0; nodeIter < this.numHiddenLayers; nodeIter++){
+            numInputs += this.numHiddenNodesPerLayer[nodeIter];
+        }
+        numNodes += this.numOutputs;
+        double[] deltas = new double[numNodes];
+
+        // calculate output node deltas
+        for(int outIter = (numNodes - 1) - this.numOutputs; outIter < numNodes; outIter++){
+            deltas[outIter] = -1 * error * this.outputDerivatives[outIter];
+        }
+
+        // calculate hidden node deltas
+        for(int layerIter = this.numHiddenLayers - 1; layerIter >= 0; layerIter--){
+            int startIndex = (numNodes - 1) - this.numOutputs - this.numHiddenNodesPerLayer[layerIter];
+            int endIndex = layerIter == this.numHiddenLayers - 1 ?
+                    (numNodes - 1) - this.numOutputs : (numNodes - 1) - this.numOutputs - this.numHiddenNodesPerLayer[layerIter + 1];
+            for(int hiddenIter = startIndex; hiddenIter < endIndex; hiddenIter++){
+                double downstreamSum = 0.0;
+                if(layerIter == this.numHiddenLayers - 1){
+                    int outputIter = 0;
+                    int multiple = (hiddenIter - startIndex) * this.numOutputs;
+                    int weightIndex = (weights.size() - 1) - (this.numHiddenNodesPerLayer[layerIter] * this.numOutputs) + multiple;
+                    while(outputIter < this.numOutputs){
+                        outputIter++;
+                        downstreamSum += (deltas[outputIter] * weights.get(weightIndex));
+                        weightIndex++;
+                    }
+                }
+                else{
+                    // only needed if we have more than one hidden layer, not working yet
+//                    int hiddenLayerIter = 0;
+//                    int multiple = (hiddenIter - startIndex) * this.numHiddenNodesPerLayer[layerIter + 1];
+//                    int weightIndex = (weights.size() - 1) - (this.numHiddenNodesPerLayer[this.numHiddenLayers - 1] * this.numOutputs) + multiple;
+//                    for(int downLayerIter = this.numHiddenLayers; downLayerIter > layerIter; downLayerIter--){
+//                        weightIndex -= (this.numHiddenNodesPerLayer[downLayerIter] * this.numOutputs);
+//                    }
+//                    while(hiddenLayerIter < this.numOutputs){
+//                        hiddenLayerIter++;
+//                        downstreamSum += (deltas[hiddenLayerIter] * weights.get(weightIndex));
+//                        weightIndex++;
+//                    }
+                }
+                int derivativeIndex = this.hiddenDerivatives.length;
+                for(int hiddenLayerIter = this.numHiddenLayers; hiddenLayerIter > layerIter; hiddenLayerIter--){
+                    derivativeIndex -= this.numHiddenNodesPerLayer[hiddenLayerIter];
+                }
+                derivativeIndex += (hiddenIter - startIndex);
+                deltas[hiddenIter] = downstreamSum * this.hiddenDerivatives[derivativeIndex];
+            }
+        }
+
+        return deltas;
     }
 
     /**
