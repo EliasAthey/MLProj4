@@ -1,3 +1,4 @@
+import javax.xml.crypto.dom.DOMCryptoContext;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -30,6 +31,16 @@ public class BackpropNN extends Clustering{
      * the momentum
      */
     private double momentum = 0.5;
+
+    /**
+     * holds the computed derivatives fro hidden layer
+     */
+    private Double[] hiddenDerivatives;
+
+    /**
+     * holds the computed derivatives for output layer
+     */
+    private Double[] outputDerivatives;
 
     @Override
     /**
@@ -88,6 +99,8 @@ public class BackpropNN extends Clustering{
         do{
             // Cluster each data point
             int[] clustering = new int[data.length];
+            this.hiddenDerivatives = new Double[this.numHiddenNodesPerLayer[0]];
+            this.outputDerivatives = new Double[this.numOutputs];
             for(int pointIter = 0; pointIter < data.length; pointIter++){
                 clustering[pointIter] = this.sendThroughNetwork(data[pointIter], weights);
             }
@@ -206,6 +219,7 @@ public class BackpropNN extends Clustering{
                     double sigmoid = this.sigmoid(currentLayer.get(valueIter));
                     currentLayer.remove(valueIter);
                     currentLayer.add(valueIter, sigmoid);
+                    this.hiddenDerivatives[valueIter] = this.sigmoidDerivative(sigmoid);
                 }
             }
             // from last hidden layer to output layer
@@ -229,10 +243,10 @@ public class BackpropNN extends Clustering{
                 // sum values in currentLayer as input for the first hidden layer and compute sigmoid
                 int nodeIter = 0;
                 for(int valueIter = 0; valueIter < currentLayer.size(); valueIter++){
-                    if(valueIter % this.numHiddenNodesPerLayer[this.numHiddenLayers - 1] == 0){
+                    if(valueIter % this.numOutputs == 0){
                         nodeIter = 0;
                     }
-                    if(valueIter >= this.numHiddenNodesPerLayer[this.numHiddenLayers - 1]) {
+                    if(valueIter >= this.numOutputs) {
                         double temp = currentLayer.get(valueIter) + currentLayer.get(nodeIter);
                         currentLayer.remove(valueIter);
                         valueIter--;
@@ -245,6 +259,7 @@ public class BackpropNN extends Clustering{
                     double sigmoid = this.sigmoid(currentLayer.get(valueIter));
                     currentLayer.remove(valueIter);
                     currentLayer.add(valueIter, sigmoid);
+                    this.outputDerivatives[valueIter] = this.sigmoidDerivative(sigmoid);
                 }
             }
             // this got really complicated really fast, not needed with only 1 hidden layer, so Im sticking to 1 hidden layer
@@ -322,7 +337,7 @@ public class BackpropNN extends Clustering{
      */
     private boolean hasConverged(ArrayList<Double> avgWeightChange){
         for(int iter = 0; iter < avgWeightChange.size(); iter++){
-            if(avgWeightChange.get(iter) > 0.0001) return false;
+            if(avgWeightChange.get(iter) > 1) return false;
         }
         return true;
     }
