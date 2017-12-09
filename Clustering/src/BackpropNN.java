@@ -327,7 +327,7 @@ public class BackpropNN extends Clustering{
      * @param prevWeightChange the prev weight change from last iteration
      */
     private void backpropogate(double error, ArrayList<Double> weights, ArrayList<Double> prevWeightChange, ArrayList<Double> inputs){
-
+        ArrayList<Double> newWeightChange = new ArrayList<>();
     }
 
     /**
