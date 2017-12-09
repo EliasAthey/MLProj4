@@ -315,8 +315,16 @@ public class BackpropNN extends Clustering{
 
     }
 
+    /**
+     * Returns true if the network has converged
+     * @param avgWeightChange the average weight changes over a past set of iterations
+     * @return true if the network has converged, false otherwise
+     */
     private boolean hasConverged(ArrayList<Double> avgWeightChange){
-        return false;
+        for(int iter = 0; iter < avgWeightChange.size(); iter++){
+            if(avgWeightChange.get(iter) > 0.0001) return false;
+        }
+        return true;
     }
 
     /**
