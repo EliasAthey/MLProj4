@@ -1,5 +1,3 @@
-import javax.xml.crypto.dom.DOMCryptoContext;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -30,12 +28,12 @@ public class BackpropNN extends Clustering{
     /**
      * the learning rate
      */
-    private double learningRate = 0.1;
+    private double learningRate = 0.001;
 
     /**
      * the momentum
      */
-    private double momentum = 0.5;
+    private double momentum = 0.7;
 
     /**
      * holds the computed derivatives fro hidden layer
@@ -114,8 +112,8 @@ public class BackpropNN extends Clustering{
                 sumWeightChanges.add(weightIter, temp + prevWeightChange.get(weightIter));
             }
 
-            // Calculate convergence every 10 iterations
-            if((loopIter + 1) % 100 == 0){
+            // Calculate convergence every 500 iterations
+            if((loopIter + 1) % 500 == 0){
                 // average sumWeightChanges
                 ArrayList<Double> avgWeightChanges = new ArrayList<>();
                 for(int weightIter = sumWeightChanges.size() - 1; weightIter >= 0; weightIter--){
@@ -448,7 +446,7 @@ public class BackpropNN extends Clustering{
      */
     private boolean hasConverged(ArrayList<Double> avgWeightChange){
         for(int iter = 0; iter < avgWeightChange.size(); iter++){
-            if(avgWeightChange.get(iter) > 0.001) return false;
+            if(Math.abs(avgWeightChange.get(iter)) > 0.001) return false;
         }
         return true;
     }
