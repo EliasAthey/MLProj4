@@ -29,6 +29,7 @@ public class Driver {
      */
     public static int swarmSize = 100;
     public static double inertia = 0.5;
+    public static double phiMax = 0.8;
 
     /**
      * DB-Scan parameters
@@ -51,45 +52,6 @@ public class Driver {
         if(!Driver.verifyArgs(args)){
             Driver.displayHelpText();
             System.exit(0);
-        }
-
-        // set the clustering algorithm
-        switch(args[0]){
-            case "aco":
-                Driver.clusteringAlgorithm = new ACO();
-                break;
-            case "dbs":
-                Driver.clusteringAlgorithm = new DBScan();
-                break;
-            case "km":
-                Driver.clusteringAlgorithm = new KMeans();
-                break;
-            case "nn":
-                Driver.clusteringAlgorithm = new BackpropNN();
-                break;
-            case "pso":
-                Driver.clusteringAlgorithm = new PSO();
-                break;
-        }
-
-        // set the data set to cluster
-        Double[][] dataset = null;
-        switch(args[2]){
-            case "haberman":
-                dataset = Data.getHaberman();
-                break;
-            case "htru2":
-                dataset = Data.getHtru2();
-                break;
-            case "iris":
-                dataset = Data.getIris();
-                break;
-            case "road":
-                dataset = Data.getRoad();
-                break;
-            case "wine":
-                dataset = Data.getWine();
-                break;
         }
 
         // check for any additional options (parameters), set accordingly
@@ -177,6 +139,16 @@ public class Driver {
                             System.exit(0);
                         }
                         break;
+                    // phi max
+                    case "-pm":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.phiMax = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-pm must be followed by a float value for the DB-Scan maximum phi value\n");
+                            System.exit(0);
+                        }
+                        break;
                     // theta
                     case "-th":
                         if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
@@ -218,12 +190,12 @@ public class Driver {
                         }
                         break;
                     // momentum
-                    case "-m":
+                    case "-mo":
                         if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
                             Driver.momentum = Float.parseFloat(args[++argIter]);
                         }
                         else{
-                            System.out.println("-m must be followed by a float value for the Backprop momentum\n");
+                            System.out.println("-mo must be followed by a float value for the Backprop momentum\n");
                             System.exit(0);
                         }
                         break;
@@ -233,6 +205,45 @@ public class Driver {
                         System.exit(0);
                 }
             }
+        }
+
+        // set the clustering algorithm
+        switch(args[0]){
+            case "aco":
+                Driver.clusteringAlgorithm = new ACO();
+                break;
+            case "dbs":
+                Driver.clusteringAlgorithm = new DBScan();
+                break;
+            case "km":
+                Driver.clusteringAlgorithm = new KMeans();
+                break;
+            case "nn":
+                Driver.clusteringAlgorithm = new BackpropNN();
+                break;
+            case "pso":
+                Driver.clusteringAlgorithm = new PSO();
+                break;
+        }
+
+        // set the data set to cluster
+        Double[][] dataset = null;
+        switch(args[2]){
+            case "haberman":
+                dataset = Data.getHaberman();
+                break;
+            case "htru2":
+                dataset = Data.getHtru2();
+                break;
+            case "iris":
+                dataset = Data.getIris();
+                break;
+            case "road":
+                dataset = Data.getRoad();
+                break;
+            case "wine":
+                dataset = Data.getWine();
+                break;
         }
 
         // get the clusters
@@ -280,7 +291,21 @@ public class Driver {
         System.out.println("[algorithm]:\taco, dbs, km, nn, pso");
         System.out.println("[num-clusters]:\tan integer greater than 1");
         System.out.println("[data-set]:\thaberman, htru2, iris, road, wine");
-        System.out.println("[optional-parameters]: TBD");
+        System.out.println("OPTIONAL PARAMETERS:");
+        System.out.println("\t[-mi maxIter]          sets the maximum number of iterations for ACO, PSO, and KMeans");
+        System.out.println("\t[-na numAnts]          sets the number of ants for ACO");
+        System.out.println("\t[-ne numEliteAnts]     sets the number of elitist ants for ACO");
+        System.out.println("\t[-pe probExplot]       sets the probability of exploitation for ACO");
+        System.out.println("\t[-rw relWeight]        sets the relative weight for ACO");
+        System.out.println("\t[-dr decayRate]        sets the pheromone decay rate for ACO");
+        System.out.println("\t[-ss swarmSize]        sets the swarm size for PSO");
+        System.out.println("\t[-in inertia]          sets the inertia for PSO");
+        System.out.println("\t[-pm phiMax]           sets the maximum phi value for PSO");
+        System.out.println("\t[-th theta]            sets the theta value for DB-Scan");
+        System.out.println("\t[-mp minPoints]        sets the minimum number of points for DB-Scan");
+        System.out.println("\t[-hn numHiddenNodes]   sets the number of hidden nodes for Neural Network");
+        System.out.println("\t[-lr learningRate]     sets the learning rate for Backprop");
+        System.out.println("\t[-mo momentum]         sets the momentum for Backprop");
         System.out.println();
     }
 

@@ -9,7 +9,7 @@ public class KMeans  extends Clustering{
     /**
      * Number of iterations
      */
-    private int maxIterations = 100;
+    private int maxIterations = Driver.maxIter;
 
     /**
      * Clusters data via the K-means Algorithm

@@ -9,35 +9,35 @@ public class ACO extends Clustering{
      * The number of ants in the system
      * Tunable
      */
-    private int numAnts = 5;
+    private int numAnts = Driver.numAnts;
 
     /**
      * Number of chosen elitist ants (only ants that can drop pheromone)
      * Tunable
      */
-    private int numElite = 1;
+    private int numElite = Driver.numElite;
 
     /**
      * The probability that an ant will exploit the pheromone levels rather than explore the space
      * Tunable
      */
-    private double probExploit = 0.1;
+    private double probExploit = Driver.probExploit;
 
     /**
      * Relative weight of an ants decision
      * Tunable
      */
-    private double relativeWeight = 0.1;
+    private double relativeWeight = Driver.relWeight;
 
     /**
      * The maximum number of iterations to run
      */
-    private double maxIterations = 100;
+    private double maxIterations = Driver.maxIter;
 
     /**
      * The rate of decay for pheromones
      */
-    private double pheromoneDecay = 0.5;
+    private double pheromoneDecay = Driver.decayRate;
 
     @Override
     /**

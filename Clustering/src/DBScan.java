@@ -4,8 +4,8 @@ import java.util.ArrayList;
  * DB-Scan clustering
  */
 public class DBScan extends Clustering{
-    private double theta = 1; //distance threshold
-    private int minPts = 40;  //num points within dist. threshold to be considered core point
+    private double theta = Driver.theta; //distance threshold
+    private int minPts = Driver.minPoints;  //num points within dist. threshold to be considered core point
     private DB_point[] dbPoints;    //dataset
 
     /**

@@ -23,17 +23,17 @@ public class BackpropNN extends Clustering{
     /**
      * number of hidden nodes in each hidden layer, default is 20
      */
-    private int[] numHiddenNodesPerLayer = {20};
+    private int[] numHiddenNodesPerLayer = {Driver.numHiddenNodes};
 
     /**
      * the learning rate
      */
-    private double learningRate = 0.001;
+    private double learningRate = Driver.learningRate;
 
     /**
      * the momentum
      */
-    private double momentum = 0.7;
+    private double momentum = Driver.momentum;
 
     /**
      * holds the computed derivatives fro hidden layer

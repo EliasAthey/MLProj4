@@ -6,13 +6,13 @@ import java.util.ArrayList;
  */
 public class PSO extends Clustering {
     private Particle[] swarm;
-    private final int swarmSize = 200;
+    private final int swarmSize = Driver.swarmSize;
     private Particle bestParticle;
-    private final double interita = .5;
-    private final double phiMax = .8;
+    private final double interita = Driver.inertia;
+    private final double phiMax = Driver.phiMax;
     private double[] maxVelocity;
     private int numClusters;
-    private int maxIter = 100;
+    private int maxIter = Driver.maxIter;
 
     @Override
     public int[] cluster(Double[][] data, int numClusters) {
