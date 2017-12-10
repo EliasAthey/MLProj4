@@ -7,6 +7,11 @@ import java.util.ArrayList;
 public class KMeans  extends Clustering{
 
     /**
+     * Number of iterations
+     */
+    private int maxIterations = 100;
+
+    /**
      * Clusters data via the K-means Algorithm
      */
     @Override
@@ -14,7 +19,7 @@ public class KMeans  extends Clustering{
         int cycles =0 ;
         ArrayList<Integer> labels = null;
         double[][] centroids = initCentroids(data, numClusters);
-        while(cycles < 200){
+        while(cycles < this.maxIterations){
             labels = getLabels(centroids, data);
             centroids = getCentroids(labels, data, numClusters);
             cycles++;
@@ -115,5 +120,13 @@ public class KMeans  extends Clustering{
             }
         }
         return minIndex;
+    }
+
+    /**
+     * Sets the maximum number of iterations
+     * @param maxIterations the maximum number of iterations
+     */
+    public void setMaxIterations(int maxIterations){
+        this.maxIterations = maxIterations;
     }
 }

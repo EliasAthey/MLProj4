@@ -1,8 +1,3 @@
-import com.sun.deploy.util.OrderedHashSet;
-import javafx.beans.binding.MapBinding;
-import javafx.collections.ObservableMap;
-
-import javax.sound.midi.Sequence;
 import java.util.*;
 
 /**
@@ -37,7 +32,7 @@ public class ACO extends Clustering{
     /**
      * The maximum number of iterations to run
      */
-    private double maxIterations = 10;
+    private double maxIterations = 100;
 
     /**
      * The rate of decay for pheromones

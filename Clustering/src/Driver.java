@@ -1,3 +1,5 @@
+import java.util.regex.Pattern;
+
 /**
  * Main class, entry point of program
  */
@@ -7,6 +9,39 @@ public class Driver {
      * the clustering algorithm used
      */
     private static Clustering clusteringAlgorithm;
+
+    /**
+     * Max iterations, used by ACO, PSO, and KMeans
+     */
+    public static int maxIter = 100;
+
+    /**
+     * ACO parameters
+     */
+    public static int numAnts = 100;
+    public static int numElite = 10;
+    public static double probExploit = 0.1;
+    public static double relWeight = 0.1;
+    public static double decayRate = 0.5;
+
+    /**
+     * PSO parameters
+     */
+    public static int swarmSize = 100;
+    public static double inertia = 0.5;
+
+    /**
+     * DB-Scan parameters
+     */
+    public static double theta = 1.0;
+    public static int minPoints = 40;
+
+    /**
+     * Neural Network parameters
+     */
+    public static int numHiddenNodes = 20;
+    public static double learningRate = 0.001;
+    public static double momentum = 0.7;
 
     /**
      * Clusters a data set using a specific clustering algorithm
@@ -55,6 +90,149 @@ public class Driver {
             case "wine":
                 dataset = Data.getWine();
                 break;
+        }
+
+        // check for any additional options (parameters), set accordingly
+        Pattern dashPattern = Pattern.compile("\\A-\\w+");
+        for(int argIter = 3; argIter < args.length; argIter++){
+            if(dashPattern.matcher(args[argIter]).matches()){
+                switch(args[argIter]){
+                    // maximum number of iterations
+                    case "-mi":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.maxIter = Integer.parseInt(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-mi must be followed by a positive integer for the maximum number of iterations\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // num Ants
+                    case "-na":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.numAnts = Integer.parseInt(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-na must be followed by a positive integer for the ACO number of ants\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // num elite Ants
+                    case "-ne":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.numElite = Integer.parseInt(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-ne must be followed by a positive integer for the ACO number of elite ants\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // probability of exploitation
+                    case "-pe":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
+                            Driver.probExploit = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-pe must be followed by a float value for the ACO probability of exploitation\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // relative weight
+                    case "-rw":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
+                            Driver.relWeight = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-rw must be followed by a float value for the ACO relative weight\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // pheromone decay rate
+                    case "-dr":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
+                            Driver.decayRate = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-dr must be followed by a float value for the ACO pheromone decay rate\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // swarm size
+                    case "-ss":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.swarmSize = Integer.parseInt(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-ss must be followed by a positive integer for the PSO swarm size\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // inertia
+                    case "-in":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
+                            Driver.inertia = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-in must be followed by a float value for the PSO inertia\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // theta
+                    case "-th":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.theta = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-th must be followed by a float value for the DB-Scan theta parameter\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // min points
+                    case "-mp":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.minPoints = Integer.parseInt(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-mp must be followed by a positive integer for the DB-Scan minimum number of points\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // num hidden nodes
+                    case "-hn":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                            Driver.numHiddenNodes = Integer.parseInt(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-hn must be followed by a positive integer for the Backprop number of hidden nodes\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // learning rate
+                    case "-lr":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
+                            Driver.learningRate = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-lr must be followed by a float value for the Backprop learning rate\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // momentum
+                    case "-m":
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
+                            Driver.momentum = Float.parseFloat(args[++argIter]);
+                        }
+                        else{
+                            System.out.println("-m must be followed by a float value for the Backprop momentum\n");
+                            System.exit(0);
+                        }
+                        break;
+                    // wrong option
+                    default:
+                        System.out.println(args[argIter] + " is not a valid option\n");
+                        System.exit(0);
+                }
+            }
         }
 
         // get the clusters

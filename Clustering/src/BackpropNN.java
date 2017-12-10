@@ -18,7 +18,7 @@ public class BackpropNN extends Clustering{
     /**
      * number of hidden layers, default is 1
      */
-    private int numHiddenLayers = 1;
+    private final int numHiddenLayers = 1;
 
     /**
      * number of hidden nodes in each hidden layer, default is 20
@@ -457,10 +457,10 @@ public class BackpropNN extends Clustering{
 
     /**
      * Sets the number of hidden nodes per layer
-     * @param numHiddenNodesPerLayer the number of hidden nodes per layer
+     * @param numHiddenNodes the number of hidden nodes per layer
      */
-    public void setNumHiddenNodesPerLayer(int[] numHiddenNodesPerLayer){
-        this.numHiddenNodesPerLayer = numHiddenNodesPerLayer;
+    public void setNumHiddenNodesPerLayer(int numHiddenNodes){
+        this.numHiddenNodesPerLayer = new int[numHiddenNodes];
     }
 
     /**

@@ -12,6 +12,7 @@ public class PSO extends Clustering {
     private final double phiMax = .8;
     private double[] maxVelocity;
     private int numClusters;
+    private int maxIter = 100;
 
     @Override
     public int[] cluster(Double[][] data, int numClusters) {
@@ -19,7 +20,7 @@ public class PSO extends Clustering {
         int cycles = 0;
         setMaxVelocity(data);       //sets the max velocity for each attribute
         initSwarm(data);            //initializes swarm with particles with random points as
-        while (cycles < 100) {      // positions and random points as velocities
+        while (cycles < maxIter) {      // positions and random points as velocities
             calcFitness(data);      //calcs and assigns fitness to all particles in swarm
             updateVelocity();
             updatePosition();
