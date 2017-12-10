@@ -82,6 +82,7 @@ public class BackpropNN extends Clustering{
         this.initializeNetwork(weights, numWeights);
         boolean hasConverged = false;
         int loopIter = 0;
+        int iterSinceBestUpdate = 0;
         do{
             // Cluster each data point
             int[] clustering = new int[data.length];
@@ -101,6 +102,7 @@ public class BackpropNN extends Clustering{
 
             // Update bestClustering
             if(error < bestError){
+                iterSinceBestUpdate = 0;
                 bestError = error;
                 bestClustering = clustering;
             }
@@ -112,14 +114,15 @@ public class BackpropNN extends Clustering{
                 sumWeightChanges.add(weightIter, temp + prevWeightChange.get(weightIter));
             }
 
-            // Calculate convergence every 500 iterations
-            if((loopIter + 1) % 500 == 0){
+            // Calculate convergence every 100 iterations
+            if((loopIter + 1) % 100 == 0){
                 // average sumWeightChanges
                 ArrayList<Double> avgWeightChanges = new ArrayList<>();
                 for(int weightIter = sumWeightChanges.size() - 1; weightIter >= 0; weightIter--){
                     avgWeightChanges.add(sumWeightChanges.get(weightIter) / (loopIter + 1));
                 }
-                hasConverged = this.hasConverged(avgWeightChanges);
+                hasConverged = this.hasConverged(avgWeightChanges, iterSinceBestUpdate);
+                iterSinceBestUpdate++;
 
                 // print current best error
                 System.out.println("Current best error: " + bestError);
@@ -444,7 +447,8 @@ public class BackpropNN extends Clustering{
      * @param avgWeightChange the average weight changes over a past set of iterations
      * @return true if the network has converged, false otherwise
      */
-    private boolean hasConverged(ArrayList<Double> avgWeightChange){
+    private boolean hasConverged(ArrayList<Double> avgWeightChange, int timeSinceBest){
+        if(timeSinceBest > 10) return true;
         for(int iter = 0; iter < avgWeightChange.size(); iter++){
             if(Math.abs(avgWeightChange.get(iter)) > 0.001) return false;
         }
