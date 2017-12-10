@@ -141,7 +141,7 @@ public class Driver {
                         break;
                     // phi max
                     case "-pm":
-                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
                             Driver.phiMax = Float.parseFloat(args[++argIter]);
                         }
                         else{
@@ -151,7 +151,7 @@ public class Driver {
                         break;
                     // theta
                     case "-th":
-                        if(argIter + 1 < args.length && Pattern.matches("\\d+", args[argIter + 1])){
+                        if(argIter + 1 < args.length && Pattern.matches("\\d+\\.\\d+", args[argIter + 1])){
                             Driver.theta = Float.parseFloat(args[++argIter]);
                         }
                         else{
