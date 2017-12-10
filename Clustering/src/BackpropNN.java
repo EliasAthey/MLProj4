@@ -90,7 +90,7 @@ public class BackpropNN extends Clustering{
             this.hiddenDerivatives = new Double[this.numHiddenNodesPerLayer[0]];
             this.outputDerivatives = new Double[this.numOutputs];
             avgInput.clear();
-            for(int iter = 0; iter < numWeights; iter++){
+            for(int iter = 0; iter < this.numHiddenNodesPerLayer[0] + this.numOutputs; iter++){
                 avgInput.add(0.0);
             }
             for(int pointIter = 0; pointIter < data.length; pointIter++){
@@ -122,10 +122,10 @@ public class BackpropNN extends Clustering{
                     avgWeightChanges.add(sumWeightChanges.get(weightIter) / (loopIter + 1));
                 }
                 hasConverged = this.hasConverged(avgWeightChanges);
-            }
 
-            // print out current error
-            System.out.println("Current error: " + error);
+                // print current best error
+                System.out.println("Current best error: " + bestError);
+            }
             loopIter++;
         }
         while(loopIter < 100000 && !hasConverged);
@@ -215,6 +215,7 @@ public class BackpropNN extends Clustering{
                     double temp = avgInputs.get(avgInputIter) + currentLayer.get(valueIter);
                     avgInputs.remove(avgInputIter);
                     avgInputs.add(avgInputIter, temp);
+                    avgInputIter++;
                     double sigmoid = this.sigmoid(currentLayer.get(valueIter));
                     currentLayer.remove(valueIter);
                     currentLayer.add(valueIter, sigmoid);
@@ -260,13 +261,13 @@ public class BackpropNN extends Clustering{
                     double temp = avgInputs.get(avgInputIter) + currentLayer.get(valueIter);
                     avgInputs.remove(avgInputIter);
                     avgInputs.add(avgInputIter, temp);
+                    avgInputIter++;
                     double sigmoid = this.sigmoid(currentLayer.get(valueIter));
                     currentLayer.remove(valueIter);
                     currentLayer.add(valueIter, sigmoid);
                     this.outputDerivatives[valueIter] = this.sigmoidDerivative(sigmoid);
                 }
             }
-            avgInputIter++;
 
             // this got really complicated really fast, not needed with only 1 hidden layer, so Im sticking to 1 hidden layer
             // from hidden layer to next hidden layer
@@ -447,7 +448,7 @@ public class BackpropNN extends Clustering{
      */
     private boolean hasConverged(ArrayList<Double> avgWeightChange){
         for(int iter = 0; iter < avgWeightChange.size(); iter++){
-            if(avgWeightChange.get(iter) > 1) return false;
+            if(avgWeightChange.get(iter) > 0.001) return false;
         }
         return true;
     }
