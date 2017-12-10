@@ -59,11 +59,14 @@ public class Driver {
 
         // get the clusters
         int numClusters = Integer.parseInt(args[1]);
+        double startMilli = System.currentTimeMillis();
         int[] clusters = Driver.clusteringAlgorithm.cluster(dataset, numClusters);
+        double timeMilli = System.currentTimeMillis() - startMilli;
 
         // evaluate clusters and print result
         double evaluation = Driver.evaluateClusters(dataset, clusters, numClusters);
-        System.out.println("Clustering Algorithm Performance: " + evaluation);
+        System.out.println("\nFinal Clustering Algorithm Performance: " + evaluation);
+        System.out.println("Time Taken (ms): " + timeMilli + "\n");
     }
 
     /**
