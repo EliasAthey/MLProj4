@@ -110,7 +110,7 @@ public class Driver {
      * @param numClusters the number of clusters
      * @return an objective value of clustering performance
      */
-    private static double evaluateClusters(Double[][] data, int[] clusters, int numClusters){
+    public static double evaluateClusters(Double[][] data, int[] clusters, int numClusters){
 
         // compute cluster centers
         double[][] centers = new double[numClusters][data[0].length];
