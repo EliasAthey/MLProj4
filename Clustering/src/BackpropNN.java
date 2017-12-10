@@ -137,7 +137,10 @@ public class BackpropNN extends Clustering{
      * Initializes the weights of the network
      */
     private void initializeNetwork(ArrayList<Double> weights, int numWeights){
-        // first calculate number of weights
+        // fix unknown bug
+        if(this.numOutputs > this.numHiddenNodesPerLayer[0]){
+            this.numHiddenNodesPerLayer = new int[this.numOutputs];
+        }
 
         // then randomly initialize weights to (-0.5, 0.5), initialize prev weight change to zero
         for(int weightIter = 0; weightIter < numWeights; weightIter++){
